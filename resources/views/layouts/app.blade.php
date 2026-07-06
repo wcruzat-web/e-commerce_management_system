@@ -1,0 +1,106 @@
+{{-- ============================================================
+    ERP SYSTEM
+    E-Commerce Management System
+
+    LAYOUT
+    Master Application Layout
+
+    STATUS
+    Frontend Development
+
+    ============================================================
+
+    PURPOSE
+
+    Shared layout used by all pages of the
+    Real-Time Order Synchronization module.
+
+    ============================================================
+
+    TODO: BACKEND
+
+    Authentication Module
+    - Session
+    - User Authentication
+
+    Notification Module
+    - Global Notifications
+
+    Shared Components
+    - Navbar
+    - Footer
+
+============================================================ --}}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>@yield('title', 'ERP System')</title>
+
+    {{-- ============================================================
+        Outfit Font
+    ============================================================ --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+        rel="stylesheet">
+
+    {{-- ============================================================
+        Vite Assets
+    ============================================================ --}}
+    @vite([
+        'resources/css/app.css',
+        'resources/js/app.js'
+    ])
+
+    @stack('styles')
+
+</head>
+
+<body
+    class="min-h-screen bg-[#F8F9FB] font-['Outfit'] antialiased">
+
+    {{-- ============================================================
+        HEADER
+
+        NOTE
+
+        Navbar is temporarily omitted while
+        developing individual module pages.
+
+        Uncomment once completed.
+
+        @include('components.header.announcement-bar')
+
+        @include('components.header.navbar')
+
+    ============================================================ --}}
+
+    <main>
+
+        @yield('content')
+
+    </main>
+
+    {{-- Future Footer --}}
+    {{-- @include('components.footer.footer') --}}
+
+    @stack('scripts')
+
+</body>
+
+</html>
