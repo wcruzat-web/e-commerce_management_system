@@ -1,262 +1,68 @@
-{{-- ============================================================
-    ERP SYSTEM
-    E-Commerce Management System
-
-    MODULE
-    Real-Time Order Synchronization
-
-    COMPONENT
-    Shipment Items
-
-    DESCRIPTION
-    Displays all products included in the tracked
-    shipment.
-
-    ============================================================
-
-    TODO: ERP INTEGRATION
-
-    DATA SOURCE
-
-    Sales Management System
-
-    Provides
-
-    • Order Items
-    • Product Name
-    • Product Image
-    • Quantity
-    • Unit Price
-    • SKU
-
-    Inventory Management System
-
-    Provides
-
-    • Warehouse
-    • Stock Allocation
-
-    NOTE
-
-    This component is READ ONLY.
-
-============================================================ --}}
-
-<section class="w-full py-8">
-
-    <div class="mx-auto max-w-7xl px-5 lg:px-10">
-
-        <div
-            class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-
-            {{-- ==================================================
-                Header
-            =================================================== --}}
-
-            <div class="border-b border-gray-200 px-6 py-5">
-
-                <h2 class="text-2xl font-semibold text-gray-900">
-
-                    Shipment Items
-
-                </h2>
-
-                <p class="mt-1 text-sm text-gray-500">
-
-                    Products included in this shipment.
-
-                </p>
-
-            </div>
-
-            {{-- ==================================================
-                TODO
-
-                Replace static array with
-
-                @foreach($order->items as $item)
-
-            =================================================== --}}
-
-            @php
-
-                $items = [
-
-                    [
-                        'image' => 'https://placehold.co/120x120',
-                        'name' => 'AMD Ryzen 7 7800X3D',
-                        'sku' => 'CPU-7800X3D',
-                        'qty' => 1,
-                        'price' => '₱23,999'
-                    ],
-
-                    [
-                        'image' => 'https://placehold.co/120x120',
-                        'name' => 'MSI B650 Gaming Plus WiFi',
-                        'sku' => 'MB-B650',
-                        'qty' => 1,
-                        'price' => '₱12,499'
-                    ],
-
-                    [
-                        'image' => 'https://placehold.co/120x120',
-                        'name' => 'Kingston Fury Beast DDR5 32GB',
-                        'sku' => 'RAM-32GB',
-                        'qty' => 2,
-                        'price' => '₱5,999'
-                    ],
-
-                ];
-
-            @endphp
-
-            <div class="divide-y divide-gray-200">
-
-                @foreach($items as $item)
-
-                    <div
-                        class="flex flex-col gap-6 p-6 transition duration-300 hover:bg-gray-50 md:flex-row md:items-center">
-
-                        {{-- ======================================
-                            Product Image
-
-                            TODO
-
-                            Replace image path.
-
-                        ======================================= --}}
-
-                        <img
-                            src="{{ $item['image'] }}"
-                            alt="{{ $item['name'] }}"
-                            class="h-28 w-28 rounded-xl border border-gray-200 object-cover">
-
-                        {{-- ======================================
-                            Product Information
-                        ======================================= --}}
-
-                        <div class="flex-1">
-
-                            <h3
-                                class="text-lg font-semibold text-gray-900">
-
-                                {{ $item['name'] }}
-
-                            </h3>
-
-                            <p
-                                class="mt-2 text-sm text-gray-500">
-
-                                SKU
-
-                                <span class="font-medium text-gray-700">
-
-                                    {{ $item['sku'] }}
-
-                                </span>
-
-                            </p>
-
-                        </div>
-
-                        {{-- ======================================
-                            Quantity
-                        ======================================= --}}
-
-                        <div
-                            class="min-w-[120px]">
-
-                            <p class="text-sm text-gray-500">
-
-                                Quantity
-
-                            </p>
-
-                            <p
-                                class="mt-2 text-lg font-semibold text-gray-900">
-
-                                × {{ $item['qty'] }}
-
-                            </p>
-
-                        </div>
-
-                        {{-- ======================================
-                            Price
-                        ======================================= --}}
-
-                        <div
-                            class="min-w-[150px]">
-
-                            <p class="text-sm text-gray-500">
-
-                                Price
-
-                            </p>
-
-                            <p
-                                class="mt-2 text-lg font-semibold text-red-600">
-
-                                {{ $item['price'] }}
-
-                            </p>
-
-                        </div>
-
+{{--
+    ==================================================================
+    ERP MODULE: Real-Time Order Synchronization (Tracking Page)
+
+    COMPONENT: Items in this Shipment
+
+    DESCRIPTION:
+    Lists all products included in the tracked shipment,
+    with icon, name, quantity, and price.
+
+    ==================================================================
+
+    TODO (Backend Integration):
+    - Replace static $shipmentItems with $order->items
+      (OrderItem model relationship)
+    - Replace static product icons with dynamic type-based icons
+    - Pull real product names, quantities, and prices from DB
+
+    ==================================================================
+--}}
+
+@php
+    // TODO: replace with $order->items relationship
+    $shipmentItems = [
+        ['name' => 'NVIDIA RTX 4050 FE', 'qty' => 1, 'price' => '₱45,999', 'type' => 'gpu'],
+        ['name' => 'Intel Core i9 14-900K', 'qty' => 1, 'price' => '₱32,940', 'type' => 'cpu'],
+    ];
+@endphp
+
+<div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+    <h2 class="text-sm font-semibold text-gray-900 mb-4">Items in this Shipment</h2>
+    <div class="space-y-3">
+        @foreach ($shipmentItems as $item)
+            <div class="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-500 shrink-0">
+                        @if($item['type'] === 'gpu')
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="7" width="20" height="10" rx="2"></rect>
+                                <circle cx="8" cy="12" r="2"></circle>
+                                <circle cx="14" cy="12" r="2"></circle>
+                                <line x1="19" y1="10" x2="19" y2="14"></line>
+                            </svg>
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="6" y="6" width="12" height="12" rx="1"></rect>
+                                <rect x="10" y="10" width="4" height="4"></rect>
+                                <line x1="6" y1="2" x2="6" y2="5"></line>
+                                <line x1="10" y1="2" x2="10" y2="5"></line>
+                                <line x1="14" y1="2" x2="14" y2="5"></line>
+                                <line x1="18" y1="2" x2="18" y2="5"></line>
+                                <line x1="6" y1="19" x2="6" y2="22"></line>
+                                <line x1="10" y1="19" x2="10" y2="22"></line>
+                                <line x1="14" y1="19" x2="14" y2="22"></line>
+                                <line x1="18" y1="19" x2="18" y2="22"></line>
+                            </svg>
+                        @endif
                     </div>
-
-                @endforeach
-
-            </div>
-
-            {{-- ==================================================
-                Footer
-
-                TODO
-
-                Display dynamic total.
-
-            =================================================== --}}
-
-            <div
-                class="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 px-6 py-5 md:flex-row md:items-center md:justify-between">
-
-                <div>
-
-                    <p class="text-sm text-gray-500">
-
-                        Total Products
-
-                    </p>
-
-                    <p class="font-semibold text-gray-900">
-
-                        3 Items
-
-                    </p>
-
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">{{ $item['name'] }}</p>
+                        <p class="text-xs text-gray-400">Qty: {{ $item['qty'] }}</p>
+                    </div>
                 </div>
-
-                <div class="text-left md:text-right">
-
-                    <p class="text-sm text-gray-500">
-
-                        Total Amount
-
-                    </p>
-
-                    <p class="text-2xl font-bold text-red-600">
-
-                        ₱48,496
-
-                    </p>
-
-                </div>
-
+                <p class="text-sm font-semibold text-gray-900">{{ $item['price'] }}</p>
             </div>
-
-        </div>
-
+        @endforeach
     </div>
-
-</section>
+</div>
