@@ -62,3 +62,17 @@
         </div>
     </div>
 </div>
+
+<script>
+    function toggleNotifications() {
+        document.getElementById('notificationsDropdown').classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function (event) {
+        const dropdown = document.getElementById('notificationsDropdown');
+        const isBellClick = event.target.closest('button[onclick="toggleNotifications()"]');
+        if (!dropdown.contains(event.target) && !isBellClick) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>

@@ -6,18 +6,6 @@
 --}}
 
 <script>
-    function toggleNotifications() {
-        document.getElementById('notificationsDropdown').classList.toggle('hidden');
-    }
-
-    document.addEventListener('click', function (event) {
-        const dropdown = document.getElementById('notificationsDropdown');
-        const isBellClick = event.target.closest('button[onclick="toggleNotifications()"]');
-        if (!dropdown.contains(event.target) && !isBellClick) {
-            dropdown.classList.add('hidden');
-        }
-    });
-
     let exportToastTimer = null;
     function exportReport() {
         const toast = document.getElementById('exportToast');
@@ -36,8 +24,4 @@
         console.log('Viewing sync logs...');
     }
 
-    function signOut() {
-        // TODO: POST /logout
-        console.log('Signing out...');
-    }
 </script>

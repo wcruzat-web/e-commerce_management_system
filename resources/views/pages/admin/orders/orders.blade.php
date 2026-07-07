@@ -10,7 +10,7 @@
 <div class="flex min-h-screen bg-slate-50" style="font-family: 'Outfit', sans-serif;">
 
     {{-- Sidebar navigation --}}
-    @include('pages.admin.dashboard.components.sidebar')
+    @include('components.admin.sidebar')
 
     <div class="flex-1 min-w-0">
 
