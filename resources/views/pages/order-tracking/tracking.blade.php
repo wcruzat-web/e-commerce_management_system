@@ -4,8 +4,9 @@
     ------------------------------------------------------------------
     FRONTEND-ONLY IMPLEMENTATION — NO BACKEND LOGIC INCLUDED.
 
-    This view composes the full Tracking Page from reusable
-    components stored in resources/views/components/tracking/.
+    This view composes the full Tracking Page from
+    page-scoped components stored alongside it in the
+    pages/order-tracking/components/ directory.
 
     The site header / top navigation (promo bar, nav links,
     search / cart / account icons) lives in
@@ -43,30 +44,30 @@
         </div>
 
         {{-- Track Another Order --}}
-        @include('components.tracking.track-another-order')
+        @include('pages.order-tracking.components.track-another-order')
 
         {{-- Order ID / Current Status Banner --}}
-        @include('components.tracking.order-status-banner')
+        @include('pages.order-tracking.components.order-status-banner')
 
         {{-- Shipment Meta Row --}}
-        @include('components.tracking.shipment-meta')
+        @include('pages.order-tracking.components.shipment-meta')
 
         {{-- Shipment Timeline --}}
-        @include('components.tracking.timeline')
+        @include('pages.order-tracking.components.timeline')
 
         {{-- Items in this Shipment --}}
-        @include('components.tracking.shipment-items')
+        @include('pages.order-tracking.components.shipment-items')
 
         {{-- Support Shortcuts --}}
-        @include('components.tracking.support-shortcuts')
+        @include('pages.order-tracking.components.support-shortcuts')
 
     </div>
 
     {{-- Floating Support / Chat Button --}}
-    @include('components.tracking.chat-button')
+    @include('pages.order-tracking.components.chat-button')
 </div>
 
 {{-- Frontend-only JavaScript --}}
-@include('components.tracking.tracking-scripts')
+@include('pages.order-tracking.components.tracking-scripts')
 
 @endsection

@@ -21,5 +21,23 @@ Route::redirect('/', '/tracking');
 |--------------------------------------------------------------------------
 */
 
-Route::view('/tracking', 'realtime-order.tracking')
+Route::view('/tracking', 'pages.order-tracking.tracking')
     ->name('tracking');
+
+/*
+|--------------------------------------------------------------------------
+| Shopping Cart
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/cart', 'pages.cart.cart')
+    ->name('cart');
+
+/*
+|--------------------------------------------------------------------------
+| Checkout — Payment
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/payment', 'pages.payment.payment')
+    ->name('payment');
