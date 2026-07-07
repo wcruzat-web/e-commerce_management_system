@@ -38,7 +38,7 @@
         <nav class="text-sm text-gray-400 mb-6">
             <a href="#" class="hover:text-gray-600">Home</a>
             <span class="mx-2">&gt;</span>
-            <span class="text-gray-700 font-medium">Shopping Cart</span>
+            <span class="text-gray-700 font-medium">Payment</span>
         </nav>
 
         {{-- Checkout Stepper (active: payment) --}}

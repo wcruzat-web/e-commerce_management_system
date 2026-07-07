@@ -73,7 +73,7 @@
               };
 
         // TODO: POST /checkout/payment with `payload`
-        console.log('Placing order with:', payload);
+        window.location.href = '/success';
     }
 
     function applyVoucher() {

@@ -22,8 +22,7 @@
 
 <script>
     function trackOrder() {
-        // TODO: navigate to route('orders.track', $order) / GET /orders/track?order=...
-        console.log('Navigating to Track Order page...');
+        window.location.href = '/tracking';
     }
 
     function continueShopping() {

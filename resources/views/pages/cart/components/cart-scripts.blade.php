@@ -85,7 +85,6 @@
     }
 
     function proceedToCheckout() {
-        // TODO (Cart Page): navigate to GET /checkout once cart is persisted
-        console.log('Proceeding to checkout...');
+        window.location.href = '/checkout';
     }
 </script>

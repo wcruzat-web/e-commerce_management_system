@@ -75,7 +75,7 @@
             zip_code: document.getElementById('zipCode').value,
             shipping_method: document.querySelector('input[name="shippingMethod"]:checked')?.value,
         };
-        // TODO: POST /checkout with `payload`, then redirect to GET /checkout/payment
-        console.log('Continuing to payment with:', payload);
+        // TODO: POST /checkout with `payload`
+        window.location.href = '/payment';
     }
 </script>
