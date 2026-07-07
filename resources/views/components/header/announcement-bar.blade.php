@@ -89,7 +89,7 @@
                    text-xs">
 
             <a
-                href="#"
+                href="{{ route('admin.dashboard') }}"
                 class="transition-colors duration-300 hover:text-red-500">
 
                 Admin Portal

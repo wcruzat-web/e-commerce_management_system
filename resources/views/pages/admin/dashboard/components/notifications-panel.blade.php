@@ -67,7 +67,7 @@
                             @include('pages.admin.dashboard.components.notification-icon', ['icon' => $n['icon'], 'class' => $n['icon_color']])
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm text-gray-700">{{ $n['title'] }}</p>
-                                <p class="text-xs text-gray-400 mt-0.5">{{ $n['time'] }}</p>
+                                <p class="text-xs text-gray-400 mt-`0.5">{{ $n['time'] }}</p>
                             </div>
                         </div>
                     @endforeach

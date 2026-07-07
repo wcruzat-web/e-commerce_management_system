@@ -15,7 +15,7 @@
         exportToastTimer = setTimeout(() => {
             toast.classList.add('hidden');
         }, 3500);
-
+        
         console.log('Export report triggered...');
     }
 

@@ -34,7 +34,7 @@
             <p>Free on orders over $99 &nbsp;|&nbsp; Next-Day Delivery Available</p>
 
             <div class="flex items-center gap-3">
-                <a href="#" class="hover:text-white">Admin Portal</a>
+                <a href="{{ route('admin.dashboard') }}" class="hover:text-white">Admin Portal</a>
                 <span class="text-white/30">|</span>
                 {{-- notification / support icon --}}
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-orange-400" viewBox="0 0 24 24" fill="currentColor">
