@@ -56,6 +56,9 @@
             {{-- Order details modal --}}
             @include('pages.admin.orders.components.order-details-modal')
 
+            {{-- Client-side filtering --}}
+            @include('pages.admin.orders.components.orders-scripts')
+
         </div>
     </div>
 </div>

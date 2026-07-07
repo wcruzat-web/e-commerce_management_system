@@ -2,7 +2,8 @@
     ERP MODULE: Admin Orders
     COMPONENT: Orders Toolbar
     DESCRIPTION: Search input, status filter, and date filter.
-    TODO: Wire to live filtering / backend
+    TODO (Backend): Replace client-side filtering with AJAX or form
+                    submission to DashboardController@orders.
 --}}
 
 <div class="flex items-center justify-between flex-wrap gap-3">
@@ -12,18 +13,18 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" placeholder="Search orders..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400">
+        <input type="text" data-orders-search placeholder="Search orders..." class="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400">
     </div>
     {{-- Filters --}}
     <div class="flex items-center gap-3">
-        <select class="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400">
+        <select data-orders-status class="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400">
             <option value="">All Status</option>
-            <option value="shipped">Shipped</option>
-            <option value="processing">Processing</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Processing">Processing</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
         </select>
-        <select class="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400">
+        <select data-orders-date class="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:border-cyan-400">
             <option value="">All Dates</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>

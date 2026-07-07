@@ -33,7 +33,12 @@
             @endphp
             @foreach ($orders as $order)
                 {{-- Order row (click to view details) --}}
-                <tr class="hover:bg-gray-50 transition-colors cursor-pointer" onclick="openOrderModal()">
+                <tr data-order-row
+                    data-customer-name="{{ $order['name'] }}"
+                    data-order-status="{{ $order['status'] }}"
+                    data-order-date="{{ $order['date'] }}"
+                    class="hover:bg-gray-50 transition-colors cursor-pointer"
+                    onclick="openOrderModal()">
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-full bg-gray-200 shrink-0"></div>
