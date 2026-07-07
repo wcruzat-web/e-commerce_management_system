@@ -50,3 +50,12 @@ Route::view('/payment', 'pages.payment.payment')
 
 Route::view('/checkout', 'pages.checkout.checkout')
     ->name('checkout');
+
+/*
+|--------------------------------------------------------------------------
+| Checkout — Order Confirmation
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/success', 'pages.success.success')
+    ->name('success');
