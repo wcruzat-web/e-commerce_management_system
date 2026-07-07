@@ -1,12 +1,12 @@
 {{--
     ==================================================================
-    ERP MODULE: Checkout — Payment (Payment Page)
+    ERP MODULE: Checkout — Shipping & Contact Details (Checkout Page)
     ------------------------------------------------------------------
     FRONTEND-ONLY IMPLEMENTATION — NO BACKEND LOGIC INCLUDED.
 
-    This view composes the full Payment Page from
+    This view composes the full Checkout Page from
     page-scoped components stored alongside it in the
-    pages/payment/components/ directory.
+    pages/checkout/components/ directory.
 
     Shared components (checkout stepper, voucher card) are
     pulled from pages/cart/components/ since they are identical.
@@ -15,15 +15,15 @@
     resources/views/layouts/app.blade.php and is rendered above
     @yield('content').
 
-    Only the Payment Page body is assembled here.
+    Only the Checkout Page body is assembled here.
 
     TODO (Backend Integration):
       Controller: CheckoutController
-      Method: showPayment() / placeOrder()
-      Route: GET /checkout/payment
-      Route: POST /checkout/payment (place order)
-      Replace static data with: $cart->summary(), $order->payment_method
-      Future: integrate real payment gateway (Stripe / PayMongo / GCash API)
+      Method: showDetails() / storeDetails()
+      Route: GET /checkout
+      Route: POST /checkout (save contact + shipping info)
+      Replace static data with: $cart->summary(), $order->shippingAddress
+      Future: prefill fields from authenticated $user->profile
     ==================================================================
 --}}
 
@@ -38,22 +38,22 @@
         <nav class="text-sm text-gray-400 mb-6">
             <a href="#" class="hover:text-gray-600">Home</a>
             <span class="mx-2">&gt;</span>
-            <span class="text-gray-700 font-medium">Payment</span>
+            <span class="text-gray-700 font-medium">Checkout</span>
         </nav>
 
-        {{-- Checkout Stepper (active: payment) --}}
-        @include('pages.cart.components.checkout-stepper', ['activeStep' => 'payment'])
+        {{-- Checkout Stepper (active: checkout) --}}
+        @include('pages.customer.cart.components.checkout-stepper', ['activeStep' => 'checkout'])
 
-        {{-- Main Grid: Payment Details (left) + Summary (right) --}}
+        {{-- Main Grid: Checkout Details (left) + Summary (right) --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {{-- Payment Details --}}
-            @include('pages.payment.components.payment-details')
+            {{-- Checkout Details --}}
+            @include('pages.customer.checkout.components.checkout-details')
 
             {{-- Sidebar --}}
             <div class="space-y-6">
-                @include('pages.cart.components.voucher-card')
-                @include('pages.payment.components.order-summary')
+                @include('pages.customer.cart.components.voucher-card')
+                @include('pages.customer.checkout.components.order-summary')
             </div>
 
         </div>
@@ -61,6 +61,6 @@
 </div>
 
 {{-- Frontend-only JavaScript --}}
-@include('pages.payment.components.payment-scripts')
+@include('pages.customer.checkout.components.checkout-scripts')
 
 @endsection

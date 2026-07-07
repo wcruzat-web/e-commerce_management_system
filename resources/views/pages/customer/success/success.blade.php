@@ -40,17 +40,17 @@
         </nav>
 
         {{-- Checkout Stepper (active: success) --}}
-        @include('pages.cart.components.checkout-stepper', ['activeStep' => 'success'])
+        @include('pages.customer.cart.components.checkout-stepper', ['activeStep' => 'success'])
 
         {{-- Main Grid: Order Confirmed (left) + Summary (right) --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {{-- Order Confirmed --}}
-            @include('pages.success.components.order-confirmed')
+            @include('pages.customer.success.components.order-confirmed')
 
             {{-- Sidebar (no voucher — order is already placed) --}}
             <div class="space-y-6">
-                @include('pages.success.components.order-summary')
+                @include('pages.customer.success.components.order-summary')
             </div>
 
         </div>
@@ -58,6 +58,6 @@
 </div>
 
 {{-- Frontend-only JavaScript --}}
-@include('pages.success.components.success-scripts')
+@include('pages.customer.success.components.success-scripts')
 
 @endsection

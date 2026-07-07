@@ -42,18 +42,18 @@
         </nav>
 
         {{-- Checkout Stepper --}}
-        @include('pages.cart.components.checkout-stepper')
+        @include('pages.customer.cart.components.checkout-stepper')
 
         {{-- Main Grid: Cart Items (left) + Summary (right) --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
             {{-- Cart Items --}}
-            @include('pages.cart.components.cart-items-list')
+            @include('pages.customer.cart.components.cart-items-list')
 
             {{-- Sidebar --}}
             <div class="space-y-6">
-                @include('pages.cart.components.voucher-card')
-                @include('pages.cart.components.order-summary')
+                @include('pages.customer.cart.components.voucher-card')
+                @include('pages.customer.cart.components.order-summary')
             </div>
 
         </div>
@@ -61,6 +61,6 @@
 </div>
 
 {{-- Frontend-only JavaScript --}}
-@include('pages.cart.components.cart-scripts')
+@include('pages.customer.cart.components.cart-scripts')
 
 @endsection

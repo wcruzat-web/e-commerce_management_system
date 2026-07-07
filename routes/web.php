@@ -21,7 +21,7 @@ Route::redirect('/', '/tracking');
 |--------------------------------------------------------------------------
 */
 
-Route::view('/tracking', 'pages.order-tracking.tracking')
+Route::view('/tracking', 'pages.customer.order-tracking.tracking')
     ->name('tracking');
 
 /*
@@ -30,7 +30,7 @@ Route::view('/tracking', 'pages.order-tracking.tracking')
 |--------------------------------------------------------------------------
 */
 
-Route::view('/cart', 'pages.cart.cart')
+Route::view('/cart', 'pages.customer.cart.cart')
     ->name('cart');
 
 /*
@@ -39,7 +39,7 @@ Route::view('/cart', 'pages.cart.cart')
 |--------------------------------------------------------------------------
 */
 
-Route::view('/payment', 'pages.payment.payment')
+Route::view('/payment', 'pages.customer.payment.payment')
     ->name('payment');
 
 /*
@@ -48,7 +48,7 @@ Route::view('/payment', 'pages.payment.payment')
 |--------------------------------------------------------------------------
 */
 
-Route::view('/checkout', 'pages.checkout.checkout')
+Route::view('/checkout', 'pages.customer.checkout.checkout')
     ->name('checkout');
 
 /*
@@ -57,5 +57,5 @@ Route::view('/checkout', 'pages.checkout.checkout')
 |--------------------------------------------------------------------------
 */
 
-Route::view('/success', 'pages.success.success')
+Route::view('/success', 'pages.customer.success.success')
     ->name('success');

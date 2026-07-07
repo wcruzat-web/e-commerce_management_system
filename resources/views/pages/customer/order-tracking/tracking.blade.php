@@ -44,30 +44,30 @@
         </div>
 
         {{-- Track Another Order --}}
-        @include('pages.order-tracking.components.track-another-order')
+        @include('pages.customer.order-tracking.components.track-another-order')
 
         {{-- Order ID / Current Status Banner --}}
-        @include('pages.order-tracking.components.order-status-banner')
+        @include('pages.customer.order-tracking.components.order-status-banner')
 
         {{-- Shipment Meta Row --}}
-        @include('pages.order-tracking.components.shipment-meta')
+        @include('pages.customer.order-tracking.components.shipment-meta')
 
         {{-- Shipment Timeline --}}
-        @include('pages.order-tracking.components.timeline')
+        @include('pages.customer.order-tracking.components.timeline')
 
         {{-- Items in this Shipment --}}
-        @include('pages.order-tracking.components.shipment-items')
+        @include('pages.customer.order-tracking.components.shipment-items')
 
         {{-- Support Shortcuts --}}
-        @include('pages.order-tracking.components.support-shortcuts')
+        @include('pages.customer.order-tracking.components.support-shortcuts')
 
     </div>
 
     {{-- Floating Support / Chat Button --}}
-    @include('pages.order-tracking.components.chat-button')
+    @include('pages.customer.order-tracking.components.chat-button')
 </div>
 
 {{-- Frontend-only JavaScript --}}
-@include('pages.order-tracking.components.tracking-scripts')
+@include('pages.customer.order-tracking.components.tracking-scripts')
 
 @endsection

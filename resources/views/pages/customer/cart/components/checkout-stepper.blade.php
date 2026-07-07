@@ -14,7 +14,7 @@
       - 'upcoming' (gray, future steps)
 
     USAGE:
-      @include('pages.cart.components.checkout-stepper', ['activeStep' => 'payment'])
+      @include('pages.customer.cart.components.checkout-stepper', ['activeStep' => 'payment'])
 
     ==================================================================
 
