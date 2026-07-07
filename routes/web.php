@@ -15,6 +15,8 @@ Route::get('/', function () {
 
 Route::redirect('/', '/tracking');
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Real-Time Order Synchronization

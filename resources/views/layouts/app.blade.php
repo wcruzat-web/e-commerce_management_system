@@ -76,19 +76,9 @@
 
     {{-- ============================================================
         HEADER
-
-        NOTE
-
-        Navbar is temporarily omitted while
-        developing individual module pages.
-
-        Uncomment once completed.
-
-        @include('components.header.announcement-bar')
-
-        @include('components.header.navbar')
-
     ============================================================ --}}
+
+    @include('components.header.header')
 
     <main>
 
