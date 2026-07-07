@@ -41,3 +41,12 @@ Route::view('/cart', 'pages.cart.cart')
 
 Route::view('/payment', 'pages.payment.payment')
     ->name('payment');
+
+/*
+|--------------------------------------------------------------------------
+| Checkout — Shipping Details
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/checkout', 'pages.checkout.checkout')
+    ->name('checkout');
