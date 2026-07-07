@@ -61,3 +61,14 @@ Route::view('/checkout', 'pages.customer.checkout.checkout')
 
 Route::view('/success', 'pages.customer.success.success')
     ->name('success');
+
+/*
+|--------------------------------------------------------------------------
+| Admin Dashboard
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin')->group(function () {
+    Route::view('/dashboard', 'pages.admin.dashboard.dashboard')->name('admin.dashboard');
+    Route::view('/orders', 'pages.admin.orders.orders')->name('admin.orders');
+});
