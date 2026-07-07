@@ -2,8 +2,19 @@
     ERP MODULE: Admin Dashboard
     COMPONENT: Topbar
     DESCRIPTION: Top bar with ERP sync status, notifications, and user info.
-    TODO: Replace with $erpSyncStatus, Auth::user()->name/role, $notifications
+    TODO (Backend): Replace static $newNotifications with $notifications
+                    from DashboardController. The data structure should include
+                    'icon', 'icon_color', 'title', 'time', 'unread' per item.
+                    $erpSyncStatus and Auth::user()->name/role also need wiring.
 --}}
+
+@php
+    $newNotifications = [
+        ['icon' => 'alert-triangle', 'icon_color' => 'text-red-500', 'title' => 'Low stock: RTX 4090 (2 units left)', 'time' => '2m ago'],
+        ['icon' => 'shopping-cart', 'icon_color' => 'text-amber-500', 'title' => 'New order: Sarah Chen — ₱42,639 (Processing)', 'time' => '5m ago'],
+        ['icon' => 'refresh-cw', 'icon_color' => 'text-green-500', 'title' => 'ERP sync completed successfully', 'time' => '15m ago'],
+    ];
+@endphp
 
 <div class="bg-white border-b border-gray-200 px-4 lg:px-6 py-3 flex items-center justify-between relative">
     {{-- Mobile hamburger --}}
@@ -32,30 +43,30 @@
                     <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
+                @if(count($newNotifications) > 0)
                 <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500"></span>
+                @endif
             </button>
 
-            {{-- NOTIFICATIONS DROPDOWN --}}
+            {{-- New notifications dropdown --}}
             <div id="notificationsDropdown" class="hidden absolute right-0 top-full mt-3 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-50">
                 <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                     <p class="text-sm font-semibold text-gray-900">Notifications</p>
-                    <span class="text-[11px] font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">1 new</span>
+                    <span class="text-[11px] font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{{ count($newNotifications) }} new</span>
                 </div>
-                <div class="px-4 py-3">
-                    <div class="flex items-start gap-2.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                            <line x1="12" y1="9" x2="12" y2="13"></line>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-xs text-gray-700">Low stock: RTX 4090 (2 units left)</p>
-                            <p class="text-[11px] text-gray-400 mt-0.5">2m ago</p>
+                <div class="max-h-64 overflow-y-auto">
+                    @foreach ($newNotifications as $n)
+                        <div class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+                            @include('pages.admin.dashboard.components.notification-icon', ['icon' => $n['icon'], 'class' => $n['icon_color']])
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs text-gray-700">{{ $n['title'] }}</p>
+                                <p class="text-[11px] text-gray-400 mt-0.5">{{ $n['time'] }}</p>
+                            </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
                 <div class="border-t border-gray-100 px-4 py-2.5">
-                    <a href="#" class="text-xs font-medium text-cyan-500 hover:text-cyan-600">View all notifications</a>
+                    <a href="#" onclick="event.preventDefault(); openNotificationsPanel();" class="text-xs font-medium text-cyan-500 hover:text-cyan-600">View all notifications</a>
                 </div>
             </div>
         </div>
@@ -70,6 +81,8 @@
         </div>
     </div>
 </div>
+
+@include('pages.admin.dashboard.components.notifications-panel')
 
 <script>
     function toggleNotifications() {

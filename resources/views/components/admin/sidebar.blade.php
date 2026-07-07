@@ -1,7 +1,8 @@
 {{--
     ERP MODULE: Admin Components
     COMPONENT: Sidebar
-    DESCRIPTION: Responsive sidebar. On desktop (lg+): static with collapse toggle.
+    DESCRIPTION: Responsive sidebar with Dashboard, Product, and Inventory links.
+                 On desktop (lg+): static with collapse toggle.
                  On mobile: off-canvas overlay with backdrop.
                  Include on any admin page via:
                      @include('components.admin.sidebar')
@@ -50,13 +51,6 @@
                 </svg>
                 <span class="sidebar-label">Dashboard</span>
             </a>
-            <a href="{{ route('admin.orders') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white text-sm font-medium transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
-                </svg>
-                <span class="sidebar-label">Orders</span>
-            </a>
             <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white text-sm font-medium transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M20 7L12 3 4 7v10l8 4 8-4V7z"></path>
@@ -64,6 +58,13 @@
                     <line x1="12" y1="11" x2="12" y2="21"></line>
                 </svg>
                 <span class="sidebar-label">Product</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white text-sm font-medium transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                </svg>
+                <span class="sidebar-label">Inventory</span>
             </a>
         </nav>
     </div>
