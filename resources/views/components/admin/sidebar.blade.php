@@ -1,20 +1,33 @@
 {{--
     ERP MODULE: Admin Components
     COMPONENT: Sidebar
-    DESCRIPTION: Collapsible navigation sidebar with brand, nav links, and sign out.
+    DESCRIPTION: Responsive sidebar. On desktop (lg+): static with collapse toggle.
+                 On mobile: off-canvas overlay with backdrop.
                  Include on any admin page via:
                      @include('components.admin.sidebar')
-                 Collapse state is persisted in localStorage.
     TODO: Replace with Auth::user()->business_name, wire nav links to routes
 --}}
 
-<aside id="adminSidebar" class="w-60 shrink-0 bg-blue-900 flex flex-col justify-between transition-all duration-300 relative">
-    {{-- Collapse toggle button --}}
+{{-- Mobile backdrop --}}
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black/30 z-30 hidden lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+<aside id="adminSidebar"
+    class="fixed inset-y-0 left-0 z-40 w-60 -translate-x-full lg:translate-x-0 lg:static lg:z-auto bg-blue-900 flex flex-col justify-between transition-all duration-300">
+
+    {{-- Collapse toggle (desktop only) --}}
     <button type="button" id="sidebarToggle"
-        class="absolute -right-3 top-1/2 w-6 h-6 rounded-full border-2 border-blue-900 bg-white text-gray-500 flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors z-10"
+        class="hidden lg:flex absolute -right-3 top-1/2 w-6 h-6 rounded-full border-2 border-blue-900 bg-white text-gray-500 items-center justify-center shadow-md hover:bg-gray-50 transition-colors z-10"
         onclick="toggleSidebar()">
         <svg id="sidebarChevron" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </button>
+
+    {{-- Mobile close button --}}
+    <button type="button" class="lg:hidden absolute top-4 right-4 text-white/60 hover:text-white" onclick="toggleMobileSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
     </button>
 
@@ -72,19 +85,37 @@
         const sidebar = document.getElementById('adminSidebar');
         const labels = document.querySelectorAll('.sidebar-label');
         const chevron = document.getElementById('sidebarChevron');
-        const isCollapsed = sidebar.classList.toggle('collapsed');
+        const isCollapsed = sidebar.style.width === '4rem' || sidebar.classList.contains('collapsed');
 
         if (isCollapsed) {
-            sidebar.style.width = '4rem';
-            labels.forEach(el => el.style.display = 'none');
-            chevron.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
-        } else {
-            sidebar.style.width = '15rem';
+            sidebar.style.width = '';
+            sidebar.classList.remove('collapsed');
             labels.forEach(el => el.style.display = '');
-            chevron.innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
+            if (chevron) chevron.innerHTML = '<polyline points="15 18 9 12 15 6"></polyline>';
+        } else {
+            sidebar.style.width = '4rem';
+            sidebar.classList.add('collapsed');
+            labels.forEach(el => el.style.display = 'none');
+            if (chevron) chevron.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
         }
 
-        localStorage.setItem('sidebarCollapsed', isCollapsed);
+        localStorage.setItem('sidebarCollapsed', !isCollapsed);
+    }
+
+    function toggleMobileSidebar() {
+        const sidebar = document.getElementById('adminSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        const isOpen = !sidebar.classList.contains('-translate-x-full');
+
+        if (isOpen) {
+            sidebar.classList.add('-translate-x-full');
+            backdrop.classList.add('hidden');
+            document.body.style.overflow = '';
+        } else {
+            sidebar.classList.remove('-translate-x-full');
+            backdrop.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
     }
 
     function signOut() {
@@ -97,13 +128,11 @@
         const chevron = document.getElementById('sidebarChevron');
         const collapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
-        if (collapsed) {
+        if (collapsed && window.innerWidth >= 1024) {
             sidebar.classList.add('collapsed');
             sidebar.style.width = '4rem';
             labels.forEach(el => el.style.display = 'none');
-            chevron.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
-        } else {
-            sidebar.style.width = '15rem';
+            if (chevron) chevron.innerHTML = '<polyline points="9 18 15 12 9 6"></polyline>';
         }
     })();
 </script>

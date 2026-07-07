@@ -5,8 +5,8 @@
     TODO: Replace with $revenueSeries / $revenueByCategory from DashboardController
 --}}
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="xl:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
         <h2 class="text-sm font-semibold text-gray-900">Revenue Overview</h2>
         <p class="text-xs text-gray-400 mb-4">Last 6 months performance</p>
 

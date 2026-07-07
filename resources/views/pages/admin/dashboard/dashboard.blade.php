@@ -18,7 +18,7 @@
         @include('pages.admin.dashboard.components.topbar')
         @include('pages.admin.dashboard.components.export-toast')
 
-        <div class="p-6 space-y-6">
+        <div class="p-4 lg:p-6 space-y-6">
 
             {{-- Page header --}}
             <div class="flex items-center justify-between flex-wrap gap-3">
@@ -49,7 +49,7 @@
             @include('pages.admin.dashboard.components.stat-cards')
             @include('pages.admin.dashboard.components.revenue-section')
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
                 @include('pages.admin.dashboard.components.recent-orders')
                 @include('pages.admin.dashboard.components.low-stocks')
             </div>

@@ -42,7 +42,7 @@
     ];
 @endphp
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
     @foreach ($stats as $stat)
         <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
             <div class="flex items-start justify-between mb-3">

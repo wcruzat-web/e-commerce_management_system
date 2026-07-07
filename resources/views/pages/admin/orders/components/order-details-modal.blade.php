@@ -9,7 +9,7 @@
 <div id="orderModal" class="hidden fixed inset-0 z-50">
     <div class="absolute inset-0 bg-black/30" onclick="closeOrderModal()"></div>
     {{-- Panel --}}
-    <div class="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl overflow-y-auto">
+    <div class="absolute right-0 top-0 h-full w-full max-w-lg bg-white shadow-2xl overflow-y-auto max-lg:max-w-full">
         <div class="p-6">
             {{-- Modal header --}}
             <div class="flex items-center justify-between mb-6">

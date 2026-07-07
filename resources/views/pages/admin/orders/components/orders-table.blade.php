@@ -6,6 +6,7 @@
 --}}
 
 <div class="orders-print-area bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
         {{-- Table header --}}
         <thead>
@@ -63,4 +64,5 @@
             @endforeach
         </tbody>
     </table>
+    </div>
 </div>

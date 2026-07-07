@@ -5,7 +5,15 @@
     TODO: Replace with $erpSyncStatus, Auth::user()->name/role, $notifications
 --}}
 
-<div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between relative">
+<div class="bg-white border-b border-gray-200 px-4 lg:px-6 py-3 flex items-center justify-between relative">
+    {{-- Mobile hamburger --}}
+    <button type="button" class="lg:hidden mr-3 text-gray-500 hover:text-gray-700" onclick="toggleMobileSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
     <div class="flex items-center gap-2 text-sm text-gray-600">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-cyan-500 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"></polyline>
@@ -16,7 +24,7 @@
         <span class="w-2 h-2 rounded-full bg-green-500"></span>
     </div>
 
-    <div class="flex items-center gap-5">
+    <div class="flex items-center gap-3 lg:gap-5">
         {{-- Notification bell --}}
         <div class="relative">
             <button type="button" onclick="toggleNotifications()" aria-label="Notifications" class="relative text-gray-500 hover:text-gray-700">

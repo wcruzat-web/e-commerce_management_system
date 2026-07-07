@@ -17,7 +17,7 @@
         {{-- Topbar with ERP sync status and user info --}}
         @include('pages.admin.dashboard.components.topbar')
 
-        <div class="p-6 space-y-6">
+        <div class="p-4 lg:p-6 space-y-6">
 
             {{-- Page header with back button and print --}}
             <div class="flex items-center justify-between flex-wrap gap-3">

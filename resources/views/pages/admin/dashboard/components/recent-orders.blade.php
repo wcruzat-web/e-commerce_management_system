@@ -5,7 +5,7 @@
     TODO: Replace with $recentOrders from DashboardController
 --}}
 
-<div class="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+<div class="xl:col-span-2 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
     <div class="flex items-center justify-between mb-4">
         <h2 class="text-sm font-semibold text-gray-900">Recent Orders</h2>
         <a href="{{ route('admin.orders') }}" class="text-xs font-medium text-cyan-500 hover:text-cyan-600">View all &gt;</a>
