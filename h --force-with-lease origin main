@@ -1,0 +1,18 @@
+[33m72f8b70[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/cruzat-frontend[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mcruzat-frontend[m[33m)[m Fixed Header and Dashboard Sidebar
+[33m1c009d4[m Fix notification FrontEnd
+[33m2af74e3[m Page Responsiveness 2.0
+[33m39d6b7e[m Pages refactored. Responsiveness of Pages also implemented
+[33m238eea4[m Function for Order Page Admin Added. Filtering and Search Function using JS
+[33me5a834b[m Admin Dashboard and Customer Order Page Added
+[33m414b741[m Header Component for all pages added
+[33m1b46a82[m Customer pages separated
+[33mf38c789[m Button functions added
+[33m0271c05[m Success Page | FrontEnd Added
+[33m7812757[m Checkout Page | FrontEnd Added
+[33md52d13c[m Payment Page | FrontEnd Added
+[33mdda3355[m Cart Page | FrontEnd Added
+[33md19c1ea[m Order-Tracking Page | FrontEnd Added
+[33m6f93edc[m Code Refactored: Order Tracking Page V0.2
+[33m1554118[m Code Refactored: Order Tracking Page
+[33m47a8313[m added tracking order page without reusable components
+[33m7210fde[m initial commit v0.1

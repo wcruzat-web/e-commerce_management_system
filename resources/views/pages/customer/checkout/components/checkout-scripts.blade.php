@@ -76,6 +76,6 @@
             shipping_method: document.querySelector('input[name="shippingMethod"]:checked')?.value,
         };
         // TODO: POST /checkout with `payload`
-        window.location.href = '/payment';
+        window.location.href = '{{ route('payment') }}';
     }
 </script>

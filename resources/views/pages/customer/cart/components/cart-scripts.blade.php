@@ -85,6 +85,6 @@
     }
 
     function proceedToCheckout() {
-        window.location.href = '/checkout';
+        window.location.href = '{{ route('checkout') }}';
     }
 </script>

@@ -2,17 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| Redirect Root
-|--------------------------------------------------------------------------
-*/
-
 Route::redirect('/', '/tracking');
 
 
@@ -25,6 +14,9 @@ Route::redirect('/', '/tracking');
 
 Route::view('/tracking', 'pages.customer.order-tracking.tracking')
     ->name('tracking');
+
+Route::view('/track', 'pages.customer.order-tracking.tracking')
+    ->name('orders.track');
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +56,16 @@ Route::view('/success', 'pages.customer.success.success')
 
 /*
 |--------------------------------------------------------------------------
+| Customer — Shop & Account
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/shop', 'pages.customer.shop.index')->name('products.index');
+
+Route::view('/account', 'pages.customer.account.index')->name('account');
+
+/*
+|--------------------------------------------------------------------------
 | Admin Dashboard
 |--------------------------------------------------------------------------
 */
@@ -71,4 +73,6 @@ Route::view('/success', 'pages.customer.success.success')
 Route::prefix('admin')->group(function () {
     Route::view('/dashboard', 'pages.admin.dashboard.dashboard')->name('admin.dashboard');
     Route::view('/orders', 'pages.admin.orders.orders')->name('admin.orders');
+    Route::view('/products', 'pages.admin.products.index')->name('admin.products');
+    Route::view('/inventory', 'pages.admin.inventory.index')->name('admin.inventory');
 });
