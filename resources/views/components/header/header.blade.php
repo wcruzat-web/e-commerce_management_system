@@ -149,7 +149,8 @@
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </button>
-                <a href="/cart" aria-label="Cart" class="text-white hover:text-cyan-300 transition-colors">
+                {{-- routes to cart page --}}
+                <a href="{{ route('cart') }}" aria-label="Cart" class="text-white hover:text-cyan-300 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1"></circle>
                         <circle cx="20" cy="21" r="1"></circle>

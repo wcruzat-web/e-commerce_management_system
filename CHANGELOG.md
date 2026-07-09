@@ -81,6 +81,44 @@ Placeholder pages so navigation works end-to-end:
 | `/admin/inventory` | `admin.inventory` | `pages/admin/inventory/index` | Sidebar "Inventory" link |
 
 ### 12:20 PM — Route Changes
+
+---
+
+## 2026-07-09 (Session 2)
+
+### 7:20 PM — Products Database
+- Created 4 migrations: categories, products, product_images, product_specifications
+- Ran `migrate:fresh` (dropped pre-existing carts, cart_items, wishlists tables)
+- All tables have proper FKs with cascade delete
+- Updated DATABASE.md with full schema docs
+- Read shop UI reference and designed schema around it (brand, badge, rating, highlight specs, etc.)
+
+### 7:40 PM — Product Models & Seeders
+- Created models: Category, Product, ProductImage, ProductSpecification (with relationships)
+- Created seeders: CategorySeeder (4 categories), ProductSeeder (4 products with 52 specifications)
+- Ran `db:seed` successfully — database has 4 categories, 4 products, 52 specs
+
+### 8:00 PM — Shop Page Live
+- Updated `/shop` route to fetch products from DB and pass to view
+- Built responsive product grid (brand, name, rating, price, sale price, badge)
+- Product cards link to detail page at `/shop/{slug}`
+- Created product detail page with:
+  - Left: Product image with badge overlay
+  - Right: Brand, name, rating, price, "At a Glance" spec cards (2×3 grid), quantity selector, add to cart, wishlist, features
+  - Bottom: Full Specifications tab with grouped spec tables in 2-column grid
+  - Placeholder tabs for Compatibility and Reviews
+
+### 8:30 PM — Cleanup & Cart Module
+- Removed 9 non-ecommerce files (users/cache/jobs migrations, User model, UserFactory, console routes, placeholder tests)
+- Updated bootstrap/app.php, config/auth.php, DatabaseSeeder.php to remove dead references
+- Created Customer, Cart, CartItem models + migrations
+- Created CartService (OOP) with methods: getOrCreateCart, addItem, updateQuantity, removeItem, getSummary
+- Created CartController with dependency-injected CartService
+- Guest customers auto-created and tracked via session (guest_customer_id)
+- Cart views converted from static data to DB-driven (cart items, order summary from $cart/$summary)
+- Quantity stepper debounces PATCH form submit; remove button submits DELETE
+- Header cart link now uses route('cart')
+- DATABASE.md updated with all new tables and removed tables
 - Added `orders.track` alias for `/track` (reuses tracking page)
 - Removed duplicate root route — `/` now redirects to `/tracking`
 - All hardcoded JS redirects (`/checkout`, `/payment`, `/success`) replaced with `{{ route('...') }}`

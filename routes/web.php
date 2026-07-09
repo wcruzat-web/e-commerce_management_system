@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/tracking');
@@ -22,10 +23,14 @@ Route::view('/track', 'pages.customer.order-tracking.tracking')
 |--------------------------------------------------------------------------
 | Shopping Cart
 |--------------------------------------------------------------------------
+| ToDo: Add voucher/coupon route (POST /cart/voucher) when coupon system is built
 */
 
-Route::view('/cart', 'pages.customer.cart.cart')
-    ->name('cart');
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/{cartItem}', [CartController::class, 'updateQuantity'])->name('cart.update');
+Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+/* {{-- ToDo: POST /cart/voucher for coupon code when coupon system is built --}} */
 
 /*
 |--------------------------------------------------------------------------
@@ -60,7 +65,16 @@ Route::view('/success', 'pages.customer.success.success')
 |--------------------------------------------------------------------------
 */
 
-Route::view('/shop', 'pages.customer.shop.index')->name('products.index');
+Route::get('/shop', function () {
+    $categories = App\Models\Category::with('products')->get();
+    $products = App\Models\Product::with('category')->where('is_active', true)->get();
+    return view('pages.customer.shop.index', compact('categories', 'products'));
+})->name('products.index');
+
+Route::get('/shop/{product:slug}', function (App\Models\Product $product) {
+    $product->load('category', 'images', 'specifications');
+    return view('pages.customer.shop.show', compact('product'));
+})->name('products.show');
 
 Route::view('/account', 'pages.customer.account.index')->name('account');
 

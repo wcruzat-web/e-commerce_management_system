@@ -1,22 +1,8 @@
 {{--
-    ==================================================================
     ERP MODULE: Shopping Cart (Cart Page)
-
     COMPONENT: Order Summary
-
-    DESCRIPTION:
-    Sidebar card showing items count, subtotal, shipping, tax,
-    grand total, and a "Proceed to Checkout" button.
-
-    ==================================================================
-
-    TODO (Backend Integration):
-    - Replace static values with $cart->subtotal / $cart->tax / $cart->shipping / $cart->grandTotal
-    - Wire "Proceed to Checkout" button to GET /checkout
-    - Dynamically calculate tax rate from config
-    - Show shipping cost instead of FREE when applicable
-
-    ==================================================================
+    DESCRIPTION: Sidebar card showing items count, subtotal, shipping, tax, grand total, and checkout button.
+    DATA SOURCE: $summary array from CartService@getSummary
 --}}
 
 <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
@@ -24,8 +10,8 @@
 
     <div class="space-y-2.5 text-sm">
         <div class="flex items-center justify-between">
-            <span class="text-gray-500">Items (<span id="summaryItemCount">3</span>)</span>
-            <span id="summarySubtotal" class="font-medium text-gray-900">$2,715</span>
+            <span class="text-gray-500">Items (<span id="summaryItemCount">{{ $summary['items_count'] }}</span>)</span>
+            <span id="summarySubtotal" class="font-medium text-gray-900">${{ number_format($summary['subtotal'], 2) }}</span>
         </div>
         <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-gray-500">
@@ -41,7 +27,7 @@
         </div>
         <div class="flex items-center justify-between">
             <span class="text-gray-500">Tax (8%)</span>
-            <span id="summaryTax" class="font-medium text-gray-900">$202</span>
+            <span id="summaryTax" class="font-medium text-gray-900">${{ number_format($summary['tax'], 2) }}</span>
         </div>
     </div>
 
@@ -49,12 +35,12 @@
 
     <div class="flex items-center justify-between mb-5">
         <span class="text-sm font-semibold text-gray-900">Grand Total</span>
-        <span id="summaryGrandTotal" class="text-lg font-bold text-gray-900">$2,728</span>
+        <span id="summaryGrandTotal" class="text-lg font-bold text-gray-900">${{ number_format($summary['grand_total'], 2) }}</span>
     </div>
 
-    <button
-        type="button"
-        onclick="proceedToCheckout()"
+    {{-- links to checkout page --}}
+    <a
+        href="{{ route('checkout') }}"
         class="w-full flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-600 transition-colors text-white text-sm font-semibold py-3 rounded-xl"
     >
         Proceed to Checkout
@@ -62,7 +48,7 @@
             <line x1="5" y1="12" x2="19" y2="12"></line>
             <polyline points="12 5 19 12 12 19"></polyline>
         </svg>
-    </button>
+    </a>
 
     <p class="flex items-center gap-1.5 text-xs text-gray-400 mt-3">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
