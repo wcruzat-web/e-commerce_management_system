@@ -75,7 +75,7 @@
         <div class="flex items-center gap-2.5">
             <div class="w-8 h-8 rounded-full bg-gray-200"></div>
             <div class="leading-tight">
-                <p class="text-xs font-semibold text-gray-900">John Doe</p>
+                <p class="text-xs font-semibold text-gray-900">Wency Cruzat</p>
                 <p class="text-[11px] text-gray-400">Super Admin</p>
             </div>
         </div>

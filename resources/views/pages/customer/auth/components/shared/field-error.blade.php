@@ -1,0 +1,1 @@
+<p id="error-{{ $field }}" class="text-xs text-red-500 mt-1 hidden"></p>

@@ -1,30 +1,13 @@
 {{--
-    ==================================================================
     ERP MODULE: Shopping Cart (Cart Page)
-    ------------------------------------------------------------------
-    FRONTEND-ONLY IMPLEMENTATION — NO BACKEND LOGIC INCLUDED.
-
-    This view composes the full Cart Page from
-    page-scoped components stored alongside it in the
-    pages/cart/components/ directory.
-
-    The site header / top navigation (promo bar, main nav,
-    search / cart / account icons) lives in
-    resources/views/layouts/app.blade.php and is rendered above
-    @yield('content').
-
-    Only the Cart Page body is assembled here.
-
-    TODO (Backend Integration):
-      Controller: CartController
-      Method: index() / update() / destroy() / applyVoucher()
-      Route: GET /cart
-      Route: PATCH /cart/{item} (quantity update)
-      Route: DELETE /cart/{item} (remove item)
-      Route: POST /cart/voucher (apply coupon code)
-      Replace static data with: $cart->items, $cart->subtotal, etc.
-      Future: sync stock levels from Product model in real time
-    ==================================================================
+    PAGE: Cart
+    DESCRIPTION: Displays cart items, quantity controls, and order summary.
+    DATA SOURCE: CartController@index — $cart (Cart model loaded via CartRepository), $summary (CartSummaryDTO)
+    ROUTES:
+      GET    /cart                 — CartController@index
+      PATCH  /cart/{cartItem}      — CartController@updateQuantity  (ToDo: wire via AJAX)
+      DELETE /cart/{cartItem}      — CartController@remove          (form submit)
+      POST   /cart/voucher         — ToDo: create when coupon system is built
 --}}
 
 @extends('layouts.app')

@@ -22,7 +22,7 @@
 
 <script>
     function trackOrder() {
-        window.location.href = '/tracking';
+        window.location.href = '{{ route('orders.track') }}';
     }
 
     function continueShopping() {

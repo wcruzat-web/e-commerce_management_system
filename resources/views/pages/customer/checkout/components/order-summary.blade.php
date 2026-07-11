@@ -1,22 +1,8 @@
 {{--
-    ==================================================================
     ERP MODULE: Checkout — Shipping & Contact Details (Checkout Page)
-
     COMPONENT: Order Summary
-
-    DESCRIPTION:
-    Sidebar card showing items count, subtotal, shipping (dynamic),
-    tax, and grand total. Shipping cost updates via JS when the
-    user selects a different shipping method.
-
-    ==================================================================
-
-    TODO (Backend Integration):
-    - Replace static values with $cart->subtotal / $cart->tax / $cart->shipping / $cart->grandTotal
-    - Dynamically calculate tax rate from config
-    - Live shipping price should come from ShippingMethod model
-
-    ==================================================================
+    DESCRIPTION: Sidebar card showing items count, subtotal, shipping, tax, grand total.
+    DATA SOURCE: $summary (CartSummaryDTO)
 --}}
 
 <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
@@ -24,8 +10,8 @@
 
     <div class="space-y-2.5 text-sm">
         <div class="flex items-center justify-between">
-            <span class="text-gray-500">Items (3)</span>
-            <span class="font-medium text-gray-900">$2,715</span>
+            <span class="text-gray-500">Items ({{ $summary->itemsCount }})</span>
+            <span class="font-medium text-gray-900">${{ number_format($summary->subtotal, 2) }}</span>
         </div>
         <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-gray-500">
@@ -37,11 +23,11 @@
                 </svg>
                 Shipping
             </span>
-            <span id="summaryShipping" class="font-medium text-green-600">FREE</span>
+            <span class="font-medium text-green-600">FREE</span>
         </div>
         <div class="flex items-center justify-between">
             <span class="text-gray-500">Tax (8%)</span>
-            <span class="font-medium text-gray-900">$202</span>
+            <span class="font-medium text-gray-900">${{ number_format($summary->tax, 2) }}</span>
         </div>
     </div>
 
@@ -49,7 +35,7 @@
 
     <div class="flex items-center justify-between mb-5">
         <span class="text-sm font-semibold text-gray-900">Grand Total</span>
-        <span id="summaryGrandTotal" class="text-lg font-bold text-gray-900">$2,728</span>
+        <span class="text-lg font-bold text-gray-900">${{ number_format($summary->grandTotal, 2) }}</span>
     </div>
 
     <p class="flex items-center gap-1.5 text-xs text-gray-400">
@@ -59,6 +45,6 @@
             <circle cx="5.5" cy="18.5" r="2.5"></circle>
             <circle cx="18.5" cy="18.5" r="2.5"></circle>
         </svg>
-        <span id="summaryShippingNote">Free shipping on this order</span>
+        Free shipping on this order
     </p>
 </div>

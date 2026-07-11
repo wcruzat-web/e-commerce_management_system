@@ -1,35 +1,13 @@
 {{--
-    ==================================================================
     ERP MODULE: Shopping Cart (Cart Page)
-
     COMPONENT: Cart Page JavaScript
-
-    DESCRIPTION:
-    Frontend-only behaviour for the shopping cart page.
-    All functions are client-side stubs — no API calls yet.
-
-    Includes:
-      - Quantity stepper (changeQty) with stock limit
-      - Remove item from cart
-      - Recalculate summary (subtotal / tax / grand total)
-      - Apply voucher placeholder
-      - Proceed to checkout placeholder
-
-    ==================================================================
-
-    TODO (Backend Integration):
-    - Wire changeQty() to PATCH /cart/{item}
-    - Wire removeItem() to DELETE /cart/{item}
-    - Wire applyVoucher() to POST /cart/voucher
-    - Wire proceedToCheckout() to GET /checkout
-    - Replace client-side math with server totals from CartController
-
-    ==================================================================
+    DESCRIPTION: Quantity stepper updates hidden input then submits PATCH form.
+                 Voucher is a placeholder stub for future coupon system.
+    ToDo: Replace form submits with AJAX (fetch) for live PATCH/DELETE without page reload
+    ToDo: Wire applyVoucher() to POST /cart/voucher when coupon system is built
 --}}
 
 <script>
-    const TAX_RATE = 0.08;
-
     function changeQty(itemId, delta) {
         const row = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
         if (!row) return;
@@ -42,49 +20,20 @@
         qtyEl.textContent = qty;
 
         const price = parseFloat(row.dataset.price);
-        row.querySelector('.line-total').textContent = '$' + (price * qty).toLocaleString();
+        row.querySelector('.line-total').textContent = '$' + (price * qty).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // TODO (Cart Page): PATCH /cart/{item} with { quantity: qty }
-        recalcSummary();
-    }
+        row.querySelector('.qty-input').value = qty;
 
-    function removeItem(itemId) {
-        const row = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
-        if (!row) return;
-        row.remove();
-
-        // TODO (Cart Page): DELETE /cart/{item}
-        recalcSummary();
-    }
-
-    function recalcSummary() {
-        const rows = document.querySelectorAll('.cart-item');
-        let subtotal = 0;
-
-        rows.forEach(row => {
-            const price = parseFloat(row.dataset.price);
-            const qty = parseInt(row.querySelector('.qty-value').textContent, 10);
-            subtotal += price * qty;
-        });
-
-        const tax = subtotal * TAX_RATE;
-        const grandTotal = subtotal + tax;
-
-        document.getElementById('itemCountBadge').textContent = rows.length + (rows.length === 1 ? ' item' : ' items');
-        document.getElementById('summaryItemCount').textContent = rows.length;
-        document.getElementById('summarySubtotal').textContent = '$' + subtotal.toLocaleString();
-        document.getElementById('summaryTax').textContent = '$' + Math.round(tax).toLocaleString();
-        document.getElementById('summaryGrandTotal').textContent = '$' + Math.round(grandTotal).toLocaleString();
+        clearTimeout(window._qtyTimer);
+        window._qtyTimer = setTimeout(() => {
+            row.querySelector('.qty-input').closest('form').submit();
+        }, 600);
     }
 
     function applyVoucher() {
         const code = document.getElementById('voucherInput').value.trim();
         if (!code) return;
-        // TODO (Cart Page): POST /cart/voucher with { code }
+        // ToDo: POST /cart/voucher with { code }
         console.log('Voucher applied:', code);
-    }
-
-    function proceedToCheckout() {
-        window.location.href = '/checkout';
     }
 </script>

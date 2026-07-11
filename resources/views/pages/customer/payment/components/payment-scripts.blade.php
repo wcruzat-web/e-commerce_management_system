@@ -73,7 +73,7 @@
               };
 
         // TODO: POST /checkout/payment with `payload`
-        window.location.href = '/success';
+        window.location.href = '{{ route('success') }}';
     }
 
     function applyVoucher() {

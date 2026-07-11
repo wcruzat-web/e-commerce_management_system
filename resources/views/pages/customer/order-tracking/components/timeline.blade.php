@@ -36,7 +36,7 @@
             'date' => 'June 28, 2026',
             'time' => '10:40 AM',
             'state' => 'done',
-        ],
+        ],  
         [
             'title' => 'Processing',
             'description' => 'Our warehouse team is packaging your items.',
