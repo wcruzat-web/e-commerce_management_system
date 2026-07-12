@@ -190,5 +190,107 @@ Seeder files:
 - `database/seeders/ProductSeeder.php`
 - `database/seeders/CustomerAddressSeeder.php`
 
+---
+
+## 2026-07-11 — Auth System + Order Tracking + Payment Fields
+
+### Schema Changes
+
+#### customers — Modified (Auth System) | Migration: `2026_07_11_064617_modify_customers_table.php`
+| Column | Type | Notes |
+|---|---|---|
+| customer_id | bigint | PK |
+| first_name | string | Renamed from `name` |
+| last_name | string | New |
+| email | string | Unique |
+| password | string | Hashed, new |
+| phone_number | string(20) | Renamed from `phone` |
+| profile_picture | string | Nullable, new |
+| status | string(20) | "Active"/"Inactive", new |
+| email_verified_at | timestamp | Nullable, new |
+| last_login | timestamp | Nullable, new |
+| remember_token | string | New |
+| timestamps | | |
+
+**Removed columns:** `name`, `address`
+
+#### orders — Modified (Payment Fields) | Migration: `2026_07_11_092926_add_payment_fields_to_orders_table.php`
+| Column | Type | Notes |
+|---|---|---|
+| order_id | bigint | PK |
+| customer_id | bigint | FK → customers |
+| order_number | string | Unique (ORD-XXXXX) |
+| status | string | Fulfillment status: pending→processing→shipped→delivered (Admin-owned) |
+| payment_status | string | Default "pending", "pending"→"paid" (ECommerce-owned) |
+| payment_method | string | "visa", "mastercard", "gcash" |
+| paid_at | timestamp | Set at order creation (payment processed time) |
+| subtotal | decimal(10,2) | |
+| tax | decimal(10,2) | |
+| grand_total | decimal(10,2) | |
+| shipping_name | string | |
+| shipping_email | string | |
+| shipping_phone | string(20) | Nullable |
+| shipping_address | text | |
+| notes | text | Nullable |
+| timestamps | | |
+
+#### customer_addresses — Modified (Removed Recipient/Phone) | Migration: `2026_07_11_080433_remove_recipient_phone_from_customer_addresses_table.php`
+**Dropped columns:** `recipient_name`, `phone_number`
+
+#### sessions — New (Auth) | Migration: `2026_07_11_065100_create_sessions_table.php`
+Standard Laravel sessions table (database driver).
+
+### New Tables
+
+#### order_tracking — ECommerce Tracking | Migration: `2026_07_11_191706_create_order_tracking_table.php`
+| Column | Type | Notes |
+|---|---|---|
+| tracking_id | bigint | PK |
+| order_id | bigint | FK → orders (cascade) |
+| tracking_number | string | UNIQUE, auto-generated TRS-###-### |
+| order_status | string | Matches order status constants |
+| courier_name | string | Default "ShopEase Express" |
+| shipped_from | string | Default "Bulacan, Philippines" |
+| estimated_delivery_date | string | "5-10 business days" |
+| last_updated | timestamp | Nullable |
+| sync_status | string | "synced", "pending", "failed" |
+| timestamps | | |
+
+### Models
+- `App\Models\Customer` — implements `Authenticatable`, uses Laravel Auth, `BelongsToMany` removed, added `hasMany(Order)`, `hasMany(Cart)`, `hasMany(CustomerAddress)`
+- `App\Models\Order` — added `payment_status`, `payment_method`, `paid_at` fillable; relationship `hasOne(OrderTracking)`
+- `App\Models\OrderTracking` — `belongsTo(Order)`, status constants (PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED)
+- `App\Models\CustomerAddress` — removed `recipient_name`, `phone_number` from fillable
+
+### Repositories
+- `App\Repositories\CustomerRepository` — added `findByEmail()`, `createRegistered()`, `updateLastLogin()`
+- `App\Repositories\OrderRepository` — added `findWithItems()`, `findByOrderNumber()`, `findByOrderNumberAndCustomer()`, `find()`
+- `App\Repositories\CartRepository` — unchanged (getOrCreate, addItem, updateQuantity, removeItem, clearCart)
+
+### Services
+- `App\Services\CustomerService` — added `authenticate()`, `register()`, `logout()` using `Auth::facade`; removed `getGuestCustomer()`
+- `App\Services\AddressService` — new: `getAddressesForCustomer()`, `findById()`
+- `App\Services\PaymentService` — new: `processPayment()` creates order + tracking record
+- `App\Services\TrackingService` — new: `findByOrderNumberForCustomer()`, `buildTimeline()`
+- `App\Services\Admin\DashboardService` — new: `getStats()`, `getRecentOrders()`, `getRevenueOverview()`, `getRevenueByCategory()`, `getLowStockProducts()`
+
+### Seeders
+- `CustomerAddressSeeder` — updated to match new schema (removed recipient_name, phone_number)
+- `DatabaseSeeder` — updated to remove `User` class reference
+
+### Auth Configuration
+- `config/auth.php` — model set to `App\Models\Customer::class`
+- `bootstrap/app.php` — removed `User` class references
+
+### Removed Migrations
+- `users`, `password_reset_tokens`, `cache`, `cache_locks`, `jobs`, `job_batches`, `failed_jobs` — all deleted
+
+### Notes
+- Session driver is `database` (uses `sessions` table)
+- `payment_status` stays `pending` until admin manually sets to `paid` (admin UI not yet built)
+- `paid_at` is set at order creation time, but "Payment Confirmed" timeline step only appears when admin sets `payment_status=paid`
+- Tracking number format: `TRS-XXX-XXX` (X = random alphanumeric)
+- Two separate status fields on orders: `status` (fulfillment, Admin-owned) and `payment_status` (payment, ECommerce-owned)
+
 ## Pending Decisions
 

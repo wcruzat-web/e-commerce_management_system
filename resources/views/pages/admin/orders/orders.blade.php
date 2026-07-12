@@ -47,11 +47,9 @@
             {{-- Search and filters --}}
             @include('pages.admin.orders.components.orders-toolbar')
 
-            {{-- Orders table card --}}
-            @include('pages.admin.orders.components.orders-table')
-
-            {{-- Pagination --}}
-            @include('pages.admin.orders.components.orders-pagination')
+            <div id="ordersTableWrapper">
+                @include('pages.admin.orders.components.orders-table-wrapper')
+            </div>
 
             {{-- Order details modal --}}
             @include('pages.admin.orders.components.order-details-modal')

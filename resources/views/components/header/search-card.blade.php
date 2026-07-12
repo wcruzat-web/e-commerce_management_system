@@ -1,3 +1,9 @@
+{{--
+    ERP MODULE: Header — Search Card Component
+    COMPONENT: SearchCard
+    DESCRIPTION: Full-width search panel with categories, trending products. Toggled by search icon in header. Data flows from shop page.
+    TODO: Wire search input to backend search endpoint
+--}}
 <section class="w-full">
     <div class="mx-auto max-w-[1280px] px-5 lg:px-8">
 

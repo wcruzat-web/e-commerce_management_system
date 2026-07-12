@@ -31,7 +31,9 @@ class LoginController extends Controller
                 ->onlyInput('email');
         }
 
-        return redirect()->intended(route('cart'));
+        $redirect = $customer->role !== 'customer' ? '/admin/dashboard' : route('cart');
+
+        return redirect()->intended($redirect);
     }
 
     public function logout(Request $request)

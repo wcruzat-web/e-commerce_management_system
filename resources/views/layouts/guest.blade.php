@@ -1,3 +1,9 @@
+{{--
+    ERP MODULE: Authentication — Guest Layout
+    LAYOUT: Guest
+    DESCRIPTION: Minimal layout for auth pages (login, register, forgot-password). Has ShopEase branding header only. No navigation or mega menu.
+    YIELDS: content, scripts
+--}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

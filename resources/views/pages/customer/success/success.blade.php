@@ -1,28 +1,8 @@
 {{--
-    ==================================================================
     ERP MODULE: Checkout — Order Confirmation (Success Page)
-    ------------------------------------------------------------------
-    FRONTEND-ONLY IMPLEMENTATION — NO BACKEND LOGIC INCLUDED.
-
-    This view composes the full Success Page from
-    page-scoped components stored alongside it in the
-    pages/success/components/ directory.
-
-    The checkout stepper is pulled from pages/cart/components/.
-
-    The site header / top navigation lives in
-    resources/views/layouts/app.blade.php and is rendered above
-    @yield('content').
-
-    Only the Success Page body is assembled here.
-
-    TODO (Backend Integration):
-      Controller: CheckoutController
-      Method: showSuccess()
-      Route: GET /checkout/success/{order}
-      Replace static data with: $order->order_number, $order->grand_total, etc.
-      Future: trigger confirmation email, link to tracking page
-    ==================================================================
+    DESCRIPTION: Displays confirmed order details (order number, total, items) after successful payment.
+    DATA SOURCE: $order fetched by session order_id from route /success
+    ROUTE: GET /success
 --}}
 
 @extends('layouts.app')

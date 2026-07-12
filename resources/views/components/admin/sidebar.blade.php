@@ -66,11 +66,22 @@
                 </svg>
                 <span class="sidebar-label">Inventory</span>
             </a>
+            @if(auth()->user()?->role === 'super_admin')
+            <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white text-sm font-medium transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span class="sidebar-label">Users</span>
+            </a>
+            @endif
         </nav>
     </div>
 
     <div class="px-3 py-5 border-t border-white/10">
-        <a href="#" onclick="event.preventDefault(); signOut();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white text-sm font-medium transition-colors">
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-blue-200 hover:bg-white/10 hover:text-white text-sm font-medium transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                 <polyline points="16 17 21 12 16 7"></polyline>
@@ -80,6 +91,8 @@
         </a>
     </div>
 </aside>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 
 <script>
     function toggleSidebar() {
@@ -117,10 +130,6 @@
             backdrop.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
-    }
-
-    function signOut() {
-        console.log('Signing out...');
     }
 
     (function initSidebar() {

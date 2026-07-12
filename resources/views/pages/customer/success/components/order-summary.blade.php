@@ -1,19 +1,8 @@
 {{--
-    ==================================================================
     ERP MODULE: Checkout — Order Confirmation (Success Page)
-
     COMPONENT: Order Summary
-
-    DESCRIPTION:
-    Sidebar card showing finalized order totals.
-    No voucher card or checkout button — order is already placed.
-
-    ==================================================================
-
-    TODO (Backend Integration):
-    - Replace static values with $order->subtotal / $order->tax / $order->shipping / $order->grandTotal
-
-    ==================================================================
+    DESCRIPTION: Sidebar card showing finalized order totals. No voucher or checkout button — order is already placed.
+    DATA SOURCE: $order from route /success
 --}}
 
 <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
@@ -21,8 +10,8 @@
 
     <div class="space-y-2.5 text-sm">
         <div class="flex items-center justify-between">
-            <span class="text-gray-500">Items (3)</span>
-            <span class="font-medium text-gray-900">$2,715</span>
+            <span class="text-gray-500">Items ({{ $order->items->sum('quantity') }})</span>
+            <span class="font-medium text-gray-900">₱{{ number_format($order->subtotal, 2) }}</span>
         </div>
         <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-gray-500">
@@ -38,7 +27,7 @@
         </div>
         <div class="flex items-center justify-between">
             <span class="text-gray-500">Tax (8%)</span>
-            <span class="font-medium text-gray-900">$202</span>
+            <span class="font-medium text-gray-900">₱{{ number_format($order->tax, 2) }}</span>
         </div>
     </div>
 
@@ -46,7 +35,7 @@
 
     <div class="flex items-center justify-between mb-1">
         <span class="text-sm font-semibold text-gray-900">Grand Total</span>
-        <span class="text-lg font-bold text-gray-900">$2,728</span>
+        <span class="text-lg font-bold text-gray-900">₱{{ number_format($order->grand_total, 2) }}</span>
     </div>
 
     <p class="flex items-center gap-1.5 text-xs text-gray-400 mt-3">

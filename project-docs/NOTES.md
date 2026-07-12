@@ -8,16 +8,21 @@ These notes document every file, function, class, and decision related to the EC
 ## Migrations
 
 ### `2026_07_09_115225_create_customers_table.php`
-Creates the `customers` table. This is one of the first tables — customers exist before cart/checkout since every cart needs an owner. Originally designed for guest flow (auto-created customer records), later expanded for authenticated users.
+Creates the `customers` table. Supports full auth (Authenticatable contract). Originally had guest-only columns (name, phone, address) — later consolidated to final schema directly in this migration.
 
 | Column | Type | Notes |
 |---|---|---|
 | customer_id | bigint | PK (not default `id`) |
-| name | string | Original single-name field (later split into first_name/last_name) |
-| email | string | Unique |
-| phone | string(20) | Nullable |
-| address | text | Nullable (later removed — address lives in customer_addresses) |
-| timestamps | | created_at, updated_at |
+| first_name | string(50) | |
+| last_name | string(50) | |
+| email | string(100) | Unique |
+| password | string(255) | Hashed |
+| phone_number | string(20) | Nullable |
+| profile_picture | string(255) | Nullable |
+| status | enum(Active,Inactive) | Default Inactive |
+| email_verified_at | timestamp | Nullable |
+| last_login | datetime | Nullable |
+| timestamps | | |
 
 ### `2026_07_09_115226_create_carts_table.php`
 One cart per customer. The cart is the container for cart items before checkout.
@@ -48,19 +53,22 @@ Each row is one product line in a cart. Stores a snapshot of the unit price at a
 These belong to Procurement/Product Master (OTHER MODULE) — we only read from them. Products, categories, images, and specifications are managed upstream.
 
 ### `2026_07_10_132723_create_orders_table.php`
-Created when user completes checkout. Stores the full order with a snapshot of shipping info.
+Created when user completes checkout. Stores the full order with a snapshot of shipping info, payment status, and fulfillment tracking.
 
 | Column | Type | Notes |
 |---|---|---|
 | order_id | bigint | PK |
 | customer_id | bigint | FK → customers |
 | order_number | string | Unique (OID-####-#### format) |
-| status | string | Default "pending" |
+| status | string | Fulfillment: pending/processing/shipped/in_transit/out_for_delivery/delivered/cancelled |
+| payment_status | string | Default "pending", set to "paid" by admin |
+| payment_method | string | visa, mastercard, or gcash |
+| paid_at | timestamp | Set at order creation (payment processed time) |
 | subtotal | decimal(10,2) | Sum of order_items subtotals |
 | tax | decimal(10,2) | 8% of subtotal |
 | grand_total | decimal(10,2) | subtotal + tax |
-| shipping_name | string | Snapshot of customer name at checkout |
-| shipping_email | string | Snapshot of email |
+| shipping_name | string | Recipient name from checkout |
+| shipping_email | string | Recipient email |
 | shipping_phone | string(20) | Nullable |
 | shipping_address | text | Full address string (street, barangay, city, etc.) |
 | notes | text | Nullable — order notes |
@@ -96,17 +104,24 @@ Saved address cards shown on checkout. A customer can have multiple addresses (H
 | is_default | boolean | Only one default per customer |
 | timestamps | | |
 
-**Removed columns (migration `2026_07_11_080433`):** `recipient_name` (string 100), `phone_number` (string 20) — both dropped because contact info is captured in the checkout form (first_name, last_name, shipping_phone) not in the address record.
-
-### `2026_07_11_064617_modify_customers_table.php`
-Transformed the `customers` table from guest-only to full auth support:
-
-**Changes:**
-- Dropped: `name`, `phone`, `address` (old guest schema)
-- Added: `first_name` (string 100), `last_name` (string 100), `password` (hashed), `phone_number` (string 20, nullable), `profile_picture` (string 255, nullable), `status` (string 20, default 'Active'), `email_verified_at` (nullable timestamp), `last_login` (nullable timestamp)
-
 ### `2026_07_11_065100_create_sessions_table.php`
 Standard Laravel sessions table. Required because we switched session driver to `database` so sessions persist even without file-based storage.
+
+### `2026_07_11_191706_create_order_tracking_table.php`
+Creates the `order_tracking` table. Stores shipment tracking records per order. Created when Admin updates payment to received. Uses `order_id` FK → orders.
+
+| Column | Type | Notes |
+|---|---|---|
+| tracking_id | bigint | PK |
+| order_id | bigint unsigned | FK → orders (cascade) |
+| tracking_number | varchar(50) | UNIQUE |
+| order_status | string | ENUM-like: Order Placed / Processing / Shipped / In Transit / Out for Delivery / Delivered |
+| courier_name | varchar(100) | Default: J&T Express |
+| shipped_from | varchar(150) | |
+| estimated_delivery_date | date | |
+| last_updated | datetime | |
+| sync_status | string | ENUM-like: Pending / Synced / Failed |
+| timestamps | | created_at, updated_at |
 
 ---
 
@@ -152,11 +167,23 @@ Standard Laravel sessions table. Required because we switched session driver to 
   - `belongsTo(Order)` — each item belongs to one order
   - `belongsTo(Product)` — references the product snapshot
 
+**Order model additional relationship:**
+- `hasOne(OrderTracking)` — an order has one tracking record
+
 ### `App\Models\CustomerAddress`
 - **Primary key:** `address_id`
 - **Fillable:** `customer_id`, `address_type`, `street`, `barangay`, `city`, `province`, `postal_code`, `country`, `is_default`
 - **Relationships:**
   - `belongsTo(Customer)` — each address belongs to one customer
+
+### `App\Models\OrderTracking`
+- **Table:** `order_tracking`
+- **Primary key:** `tracking_id`
+- **Status values (inline strings):** `Order Placed`, `Processing`, `Shipped`, `In Transit`, `Out for Delivery`, `Delivered`; sync: `Pending`, `Synced`, `Failed`
+- **Casts:** `estimated_delivery_date` → date, `last_updated` → datetime
+- **Fillable:** all columns
+- **Relationships:**
+  - `belongsTo(Order)` — each tracking record belongs to one order
 
 ---
 
@@ -180,11 +207,12 @@ A Data Transfer Object — a plain PHP class with typed `readonly` properties. R
 
 Usage: `$summary->subtotal` instead of `$summary['subtotal']`.
 
-#### `App\DTOs\CheckoutDataDTO`
-Typed DTO holding validated checkout form data. Created in the controller after validation, passed to CheckoutService.
+#### `App\DTOs\PaymentDataDTO`
+Typed DTO holding validated payment and shipping data. Created in PaymentController after validation, passed to PaymentService.
 
 | Property | Type | Description |
 |---|---|---|
+| `paymentMethod` | string | `visa`, `mastercard`, or `gcash` |
 | `shippingName` | string | first_name + last_name combined |
 | `shippingEmail` | string | Customer email for this order |
 | `shippingPhone` | string | Phone number, defaults to empty string |
@@ -208,8 +236,6 @@ Repositories only talk to the database. No business logic, no calculations.
 #### `App\Repositories\CustomerRepository`
 | Method | What it does |
 |---|---|
-| `find(id)` | Finds a customer by ID |
-| `findByEmail(email)` | Finds a customer by email (used in auth) |
 | `createRegistered(data)` | Creates a new registered customer with name, email, hashed password |
 | `updateLastLogin(customer)` | Sets `last_login` to now and saves |
 
@@ -217,8 +243,22 @@ Repositories only talk to the database. No business logic, no calculations.
 | Method | What it does |
 |---|---|
 | `create(data)` | Inserts a new order row |
-| `addItem(orderId, data)` | Inserts an order_items row linked to an order |
+| `addItem(order, data)` | Inserts an order_items row linked to an order |
 | `loadItems(order)` | Eager-loads items with product data |
+| `findWithItems(orderId)` | Finds an order by ID with items + product relations loaded |
+| `findByOrderNumberAndCustomer(orderNumber, customerId)` | Finds an order by order_number scoped to a customer |
+| `find(orderId)` | Finds an order by ID with items + tracking loaded |
+| `findAllPaginated(filters, perPage)` | Returns paginated orders with customer, items, tracking; supports search (order_number, shipping_name, shipping_email, customer name), status, payment_status, date range filters |
+| `update(orderId, data)` | Updates an order and returns fresh with items + tracking |
+
+#### `App\Repositories\CustomerAddressRepository`
+| Method | What it does |
+|---|---|
+| `findExact(customerId, street, barangay, city, province, postal, country)` | Checks if an address with exact same fields already exists for this customer (duplicate detection) |
+| `findByCustomerAndId(customerId, addressId)` | Finds a specific address by ID, scoped to the customer (prevents accessing another customer's address) |
+| `create(data)` | Inserts a new address row; first address for customer gets `is_default: true` |
+| `update(addressId, data)` | Updates an existing address's columns |
+| `countByCustomer(customerId)` | Returns count of addresses for this customer |
 
 ### Services
 
@@ -244,10 +284,32 @@ Business logic only. Uses `CartRepository` for DB and returns `CartSummaryDTO` i
 | `removeItem(cartItem)` | Delegates delete to repository |
 | `getSummary(cart)` | Loops items, calculates counts + totals, returns a CartSummaryDTO |
 
-#### `App\Services\CheckoutService`
+#### `App\Services\AddressService`
 | Method | What it does |
 |---|---|
-| `createOrder(cart, dto)` | Creates the Order row via OrderRepository → copies each cart item into order_items via addItem → clears all cart items (deleteItems) → returns the order with items loaded |
+| `saveOrUpdate(data)` | If `address_id` present → updates existing via CustomerAddressRepository::update(). If exact match exists → returns existing unchanged. If new → creates via CustomerAddressRepository::create() (first = default). Returns the address with its address_id |
+| `saveFromOrder(customerId, dto)` | Called automatically after order creation — builds address data from checkout DTO + customer ID, then delegates to saveOrUpdate() |
+| `getAddresses(customerId)` | Returns all addresses for a customer, ordered by `is_default` DESC then `created_at` DESC |
+
+#### `App\Services\TrackingService`
+| Method | What it does |
+|---|---|
+| `findByOrderNumberForCustomer(orderNumber, customerId)` | Finds an order by number scoped to customer |
+| `buildTimeline(order)` | Derives timeline steps from `order_tracking` if exists, otherwise from `order.created_at` (Order Placed), `order.paid_at` (Payment Confirmed), and `order.status` (remaining steps) |
+
+#### `App\Services\PaymentService`
+| Method | What it does |
+|---|---|
+| `processPayment(cart, dto)` | Creates Order with `payment_status = pending` + `paid_at = now()` via OrderRepository → copies cart items into order_items → clears cart items → creates OrderTracking record (TRS-###-###, ShopEase Express, Bulacan, 5-10 day delivery) → returns loaded order |
+
+#### `App\Services\Admin\DashboardService`
+| Method | What it does |
+|---|---|
+| `getStats()` | Returns total revenue (paid orders), orders this month count, total orders, low stock count (stock ≤ 5) |
+| `getRecentOrders(limit)` | Latest N orders with customer name, item names, total, status |
+| `getRevenueOverview()` | Last 6 months monthly revenue sums |
+| `getRevenueByCategory()` | Revenue grouped by product category, sorted highest first |
+| `getLowStockProducts()` | Products with stock ≤ 5, sorted by stock ascending |
 
 ### Controllers
 
@@ -265,10 +327,33 @@ The HTTP layer. Only job is receiving requests and returning responses. Services
 | Method | Route | What it does |
 |---|---|---|
 | `index` | `GET /checkout` | Gets customer → gets cart + summary → loads saved addresses → renders checkout form. Redirects to cart if cart is empty |
-| `store` | `POST /checkout` | Validates form (first/last name, email, phone, full address, notes) → creates CheckoutDataDTO → calls CheckoutService::createOrder → saves address to customer_addresses (with duplicate check; first becomes default) → redirects to /payment with order_id |
+| `store` | `POST /checkout` | Validates form (first/last name, email, phone, full address, notes) → saves address via AddressService → stores validated data as `checkout_data` in session → redirects to /payment |
 | `saveAddress` | `POST /checkout/address` | JSON-only endpoint. If `address_id` provided → updates existing address. If exact match exists → returns existing. Otherwise → creates new address. Returns `{ address: {...} }`. First saved address becomes default |
 
-**Note:** `saveAddress` returns JSON (AJAX). `store` returns a redirect (standard form POST). Full REST API for checkout will be converted per-page later.
+#### `App\Http\Controllers\PaymentController`
+| Method | Route | What it does |
+|---|---|---|
+| `index` | `GET /payment` | Checks `checkout_data` session exists → gets cart + summary → renders payment form. Redirects to checkout if no data, to cart if empty |
+| `process` | `POST /payment` | Validates only the selected payment method's fields → creates PaymentDataDTO → calls PaymentService::processPayment → forgets checkout_data + stores order_id in session → redirects to /success |
+
+**Note:** Validation rules are built conditionally per payment method (no `required_if` — only the selected method's rules are added to `$rules`).
+
+#### `App\Http\Controllers\TrackingController`
+| Method | Route | What it does |
+|---|---|---|
+| `index` | `GET /tracking` | If `order_id` in session → loads order + builds timeline → renders tracking page with data. Otherwise renders blank search form |
+| `track` | `POST /track` | Validates `order_number` → looks up via TrackingService → if found, renders page with order + timeline; if not found, redirects back with error |
+
+#### `App\Http\Controllers\Admin\DashboardController`
+| Method | Route | What it does |
+|---|---|---|
+| `index` | `GET /admin/dashboard` | Aggregates stats (total revenue, orders this month, low stock count), recent 2 orders, 6-month revenue chart data, revenue by category, low stock products via DashboardService → renders dashboard view |
+| `print` | `GET /admin/dashboard/print` | Same data in print-friendly layout with chart, stat cards, tables — open via Export Report button |
+
+#### `App\Http\Controllers\SuccessController`
+| Method | Route | What it does |
+|---|---|---|
+| `index` | `GET /success` | Gets `order_id` from session → calls OrderRepository::findWithItems → renders success view. Redirects to cart if no order_id in session |
 
 #### `App\Http\Controllers\Auth\LoginController`
 | Method | Route | What it does |
@@ -331,24 +416,41 @@ Main cart page. Extends `layouts.app`. Two-column layout: left has checkout step
 Extends `layouts.app`. Two-column layout: left has checkout stepper (step 2 active) + checkout details form, right has order summary.
 
 **Included components:**
-- `components/checkout-details.blade.php` — The main form. Contains:
-  - **Contact fields:** first_name, last_name, email, shipping_phone
-  - **Address section:** Saved address cards (if any) → hidden address fields container → "Use Another Address" button
-  - **Address modal overlay:** Fixed backdrop modal with address form (address_type dropdown, street, barangay, city, province, postal_code, country) → "Use This Address" button
-  - **Notes textarea**
-  - **Continue to Payment button**
-  - **JavaScript:** All modal/card logic inline (see JS section below)
+- `components/checkout-details.blade.php` — The main form, reduced from ~460 to ~150 lines after extraction. Contains inline JS + @includes for sub-components
+- `components/contact-fields.blade.php` — Extracted form fields: first_name, last_name, email, shipping_phone. Each has label + input with old value + @error directive
+- `components/address-section.blade.php` — Saved address cards (loops `$addresses`), hidden address fields container, "Use Another Address" dashed button card, and the full address modal overlay (fixed backdrop, form with address_type dropdown, street, barangay, city, province, postal_code, country, "Use This Address" button)
+- `components/order-notes.blade.php` — Notes textarea + "Continue to Payment" submit button
 - `components/order-summary.blade.php` — Same as cart sidebar but for checkout
 - `components/checkout-scripts.blade.php` — Additional checkout JS if needed
 
 ### Payment Page
-`payment.blade.php` (pages/customer/payment/) — Static view only. Shows checkout stepper (step 3 active), payment form placeholders, order summary. No payment processing backend yet.
+`payment.blade.php` (pages/customer/payment/) — Extends `layouts.app`. Two-column layout: left has checkout stepper (step 3 active) + payment form, right has order summary from cart.
+
+**Included components:**
+- `components/checkout-stepper.blade.php` — Shared from cart, step 3 (Payment) active
+- `components/payment-details.blade.php` — Payment method tabs (Visa/Mastercard/GCash) with dynamic field visibility, place order button
+- `components/order-summary.blade.php` — Items count, subtotal, tax, grand total from `$summary`
+- `components/payment-scripts.blade.php` — JS for payment method switching, client-side validation, form submit, `payment_error` toast display
 
 ### Success Page
-`success.blade.php` (pages/customer/success/) — Static confirmation page showing order confirmed message, order summary. Stepper shows all 4 steps done.
+`success.blade.php` (pages/customer/success/) — Extends `layouts.app`. Two-column layout: left has order confirmation card, right has order summary. Data sourced from session-stored `order_id` via `OrderRepository::findWithItems()`.
+
+**Included components:**
+- `components/order-confirmed.blade.php` — Order number, success icon, shipping details, order items list
+- `components/order-summary.blade.php` — Items count, subtotal, tax, grand total from `$order`
 
 ### Order Tracking Page
-`tracking.blade.php` (pages/customer/order-tracking/) — Static tracking view with order status banner, timeline, shipment items, shipment meta, support shortcuts, chat button, track-another-order form.
+`tracking.blade.php` (pages/customer/order-tracking/) — Extends `layouts.app`. If `$order` is set in controller, shows status banner, shipment meta, timeline, and items; otherwise shows only search form.
+
+**Included components:**
+- `components/track-another-order.blade.php` — Search form, `POST /track`, validates `order_number`
+- `components/order-status-banner.blade.php` — Order number + status badge with dynamic color mapping
+- `components/shipment-meta.blade.php` — Carrier, tracking #, shipped from, est delivery from `$order->tracking`
+- `components/timeline.blade.php` — Collapsed/expanded timeline from `$timelineSteps` (derived from `order_tracking` or fallback to `order.status`)
+- `components/shipment-items.blade.php` — Loops `$order->items` with real product names/qty/prices
+- `components/support-shortcuts.blade.php` — Call + email support cards
+- `components/chat-button.blade.php` — Floating chat button stub
+- `components/tracking-scripts.blade.php` — Timeline toggle + clipboard copy
 
 ### Dummy Pages
 - `shop/index.blade.php` — Product grid: brand, name, rating, price, sale price, badge overlay. Fetches from DB.
@@ -438,10 +540,11 @@ Creates a new address card `<label>` element dynamically and prepends it to `#sa
 | GET | `/checkout` | `CheckoutController@index` | `checkout` |
 | POST | `/checkout` | `CheckoutController@store` | `checkout.store` |
 | POST | `/checkout/address` | `CheckoutController@saveAddress` | `checkout.address.save` |
-| GET | `/payment` | `pages.customer.payment.payment` | `payment` |
-| GET | `/success` | `pages.customer.success.success` | `success` |
-| GET | `/tracking` | `pages.customer.order-tracking.tracking` | `tracking` |
-| GET | `/track` | `pages.customer.order-tracking.tracking` | `orders.track` |
+| GET | `/payment` | `PaymentController@index` | `payment` |
+| POST | `/payment` | `PaymentController@process` | `payment.process` |
+| GET | `/success` | `SuccessController@index` | `success` |
+| GET | `/tracking` | `TrackingController@index` | `tracking` |
+| POST | `/track` | `TrackingController@track` | `orders.track` |
 | GET | `/login` | `LoginController@showLoginForm` | `login` |
 | POST | `/login` | `LoginController@login` | — |
 | GET | `/register` | `RegisterController@showRegistrationForm` | `register` |
@@ -484,10 +587,9 @@ Creates a new address card `<label>` element dynamically and prepends it to `#sa
 7. User clicks "Continue to Payment" → `POST /checkout`
 8. `CheckoutController@store`:
    - Validates all fields (name, email, phone, address, notes)
-   - Creates `CheckoutDataDTO`
-   - Calls `CheckoutService::createOrder()` → creates Order + OrderItems → clears cart
    - Auto-saves address to `customer_addresses` (skips if duplicate; first becomes default)
-   - Redirects to `/payment` with `order_id` in session flash
+   - Stores validated data in session as `checkout_data`
+   - Redirects to `/payment` (**no order created yet**)
 
 ### Address Save Flow (useAddressFromModal)
 
@@ -512,13 +614,43 @@ Creates a new address card `<label>` element dynamically and prepends it to `#sa
 
 ---
 
+## Payment Flow
+
+1. **Checkout POST** → validates form, saves address, stores `checkout_data` in session. No order created yet.
+2. **Payment GET** → loads cart + `checkout_data` from session. Shows totals from cart.
+3. **Payment POST** → validates only the selected payment method's fields (conditional rules, no `required_if`):
+   - **Visa/Mastercard**: cardholder name, Luhn check on card number, MM/YY expiry (not expired), 3-4 digit CVV
+   - **GCash**: name, number must be exactly 10 digits (`+63` prefix is fixed in the UI)
+4. Creates `PaymentDataDTO` with shipping + payment info.
+5. Calls `PaymentService::processPayment()` → creates Order with `payment_status = pending` + `paid_at = now()` → copies cart items into order_items → clears cart items → returns loaded Order.
+6. Forgets `checkout_data` from session, stores `order_id` in session.
+7. Redirects to `/success`.
+8. `SuccessController@index` → reads `order_id` from session → `OrderRepository::findWithItems()` → renders success view.
+
+---
+
+## Order Status Fields — Responsibility Split
+
+The `orders` table has two separate status fields with different owners:
+
+| Field | Values | Owner | Description |
+|---|---|---|---|
+| `status` | pending → processing → shipped → delivered | **Admin/Order Management** (not yet built) | Tracks order fulfillment lifecycle |
+| `payment_status` | pending → paid | **ECommerce (us)** | Tracks whether payment was completed |
+| `paid_at` | timestamp or null | **ECommerce (us)** | Set to current time when payment succeeds |
+
+Payment flow: Checkout validates → stores data in session → Payment Controller validates card → **only on success** creates order with `payment_status = pending` + `paid_at = now()`. The `status` field stays `pending` for admin to manage later. Admin changes `payment_status` to `paid` after verification.
+
+---
+
 ## Pending / Not Yet Built
 
 | Feature | Status |
 |---|---|
-| Payment processing | Static view only |
-| Order tracking backend | Static view only |
-| Admin order management | Static table |
+| Payment processing | **Built (OOP)** — PaymentService + PaymentDataDTO + conditional validation. Payment stays `pending` — admin verifies later |
+| Order tracking backend | **Built (OOP)** — TrackingService + TrackingController + OrderTracking model + dynamic timeline from `order_tracking` or fallback to `order.status` |
+| Admin dashboard | **Built (OOP)** — DashboardController + DashboardService. Real data: revenue, orders, low stocks, revenue chart, category breakdown |
+| Admin order management | **Built** — OrderController (index/show/updatePayment/updateStatus/updateTracking), real DB data, AJAX modal with payment confirm + fulfillment status dropdown + tracking sync actions |
 | Admin product management | Static list |
 | Account/profile settings | Placeholder page |
 | Order history for customers | No route or view |
@@ -526,3 +658,91 @@ Creates a new address card `<label>` element dynamically and prepends it to `#sa
 | Password reset | Returns "not implemented" |
 | Google OAuth | Placeholder buttons only |
 | REST API for checkout | Only `saveAddress` is JSON; `store` is form POST |
+
+---
+
+## 2026-07-12 — Codebase Cleanup
+
+### Migrations Consolidation
+- Merged `modify_customers_table` columns into `create_customers_table` (final schema)
+- Merged `add_payment_fields_to_orders` + `add_payment_method_to_orders` into `create_orders_table` (final schema)
+- Deleted `remove_recipient_phone_from_customer_addresses` (original migration already cleaned)
+- **Deleted migration files (4):** `modify_customers_table`, `add_payment_fields_to_orders`, `add_payment_method_to_orders`, `remove_recipient_phone_from_customer_addresses`
+
+### Dead PHP Code Removed
+- `app/Services/CheckoutService.php` — entire file; logic duplicated in PaymentService
+- `app/DTOs/CheckoutDataDTO.php` — only referenced by deleted CheckoutService
+- `CustomerRepository::find()` — never called
+- `CustomerRepository::findByEmail()` — never called
+- `TrackingService::findByOrderNumber()` — never called externally
+- `OrderRepository::findByOrderNumber()` — only called by dead service method
+- `OrderTracking` constants (all 9) — defined but never referenced by name
+- `use Illuminate\Support\Facades\Hash` in CustomerService — unused import
+
+### Dead Views Removed (4 files)
+- `components/header/announcement-bar.blade.php` — never included (announcement bar is inline in header)
+- `components/header/search-card.blade.php` — never included
+- `pages/dummy/shop/components/search.blade.php` — empty skeleton
+- `pages/customer/auth/components/shared/field-error.blade.php` — never included
+
+### Dead JS Removed
+- `resources/js/tracking.js` — disconnected from templates (element IDs didn't exist)
+- `resources/js/app.js` — emptied (only imported tracking.js)
+- `selectShippingOption()` function in checkout-scripts — no matching HTML exists
+
+---
+
+## 2026-07-12 — Role-Based Access Control
+
+### Architecture
+| Role | Access |
+|---|---|
+| `super_admin` | Admin dashboard + user management (create admin/customer) |
+| `admin` | Admin dashboard only (no user management) |
+| `customer` | Storefront only — no admin access |
+
+### Changes Made
+
+**1. Migration — `add_role_to_customers_table`**
+- Added `role` column (string, 20) with default `'customer'` after `status`.
+
+**2. Middleware — `CheckRole`**
+- `app/Http/Middleware/CheckRole.php` — accepts variadic role strings, aborts 403 if not matched.
+
+**3. Middleware registration — `bootstrap/app.php`**
+- Registered alias `role` for `CheckRole`.
+- `redirectUsersTo` closure: customers → `/cart`, admins → `/admin/dashboard`.
+- `redirectGuestsTo` set to `/login`.
+
+**4. Login redirect — `LoginController`**
+- After auth: admins redirect to `/admin/dashboard`, customers to intended or cart.
+
+**5. Admin routes — `routes/web.php`**
+- Admin routes wrapped in `middleware(['auth', 'role:super_admin,admin'])`.
+- User management routes under separate `role:super_admin` middleware group:
+  - `GET /admin/users` — list users
+  - `GET /admin/users/create` — create form
+  - `POST /admin/users` — store new user
+
+**6. Sidebar — `components/admin/sidebar.blade.php`**
+- Added "Users" nav link (visible only to `super_admin`).
+- Sign Out now triggers the logout form instead of a console log.
+
+**7. Header — `components/header/header.blade.php`**
+- Removed "Admin Portal" link (line 37).
+
+**8. Super Admin — seeded**
+- `admin@admin.com` / `password` with `role = super_admin`.
+
+**9. Demo Customer — updated**
+- `demo@example.com` / `password` now has `role = customer`.
+
+### New Files
+| File | Purpose |
+|---|---|
+| `database/migrations/2026_07_12_173227_add_role_to_customers_table.php` | Add role column |
+| `app/Http/Middleware/CheckRole.php` | Role-checking middleware |
+| `app/Http/Controllers/Admin/UserController.php` | User CRUD (super_admin only) |
+| `database/seeders/UserSeeder.php` | Seeds super_admin + updates demo customer |
+| `resources/views/pages/admin/users/index.blade.php` | User list page |
+| `resources/views/pages/admin/users/create.blade.php` | Create user form |

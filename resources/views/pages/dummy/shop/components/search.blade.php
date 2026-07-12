@@ -1,3 +1,9 @@
+{{--
+    ERP MODULE: Dummy — Shop Search Component (Placeholder)
+    COMPONENT: Search
+    DESCRIPTION: Skeleton/search placeholder for shop product search. Currently empty — needs implementation.
+    TODO: Implement search functionality with filters
+--}}
 <!DOCTYPE html>
 <html lang="en">
 <head>

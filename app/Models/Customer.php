@@ -22,6 +22,7 @@ class Customer extends Model implements AuthenticatableContract
         'status',
         'email_verified_at',
         'last_login',
+        'role',
     ];
 
     protected $hidden = [

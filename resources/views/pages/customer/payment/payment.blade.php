@@ -34,23 +34,18 @@
 <div class="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8" style="font-family: 'Outfit', sans-serif;">
     <div class="max-w-6xl mx-auto">
 
-        {{-- Breadcrumb --}}
         <nav class="text-sm text-gray-400 mb-6">
             <a href="#" class="hover:text-gray-600">Home</a>
             <span class="mx-2">&gt;</span>
             <span class="text-gray-700 font-medium">Payment</span>
         </nav>
 
-        {{-- Checkout Stepper (active: payment) --}}
         @include('pages.customer.cart.components.checkout-stepper', ['activeStep' => 'payment'])
 
-        {{-- Main Grid: Payment Details (left) + Summary (right) --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {{-- Payment Details --}}
             @include('pages.customer.payment.components.payment-details')
 
-            {{-- Sidebar --}}
             <div class="space-y-6">
                 @include('pages.customer.cart.components.voucher-card')
                 @include('pages.customer.payment.components.order-summary')
@@ -60,7 +55,6 @@
     </div>
 </div>
 
-{{-- Frontend-only JavaScript --}}
 @include('pages.customer.payment.components.payment-scripts')
 
 @endsection

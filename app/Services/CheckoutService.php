@@ -43,8 +43,6 @@ class CheckoutService
             ]);
         }
 
-        $cart->items()->delete();
-
         return $this->orderRepository->loadItems($order);
     }
 }

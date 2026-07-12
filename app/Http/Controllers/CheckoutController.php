@@ -2,18 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\DTOs\CheckoutDataDTO;
-use App\Models\CustomerAddress;
+use App\Services\AddressService;
 use App\Services\CartService;
-use App\Services\CheckoutService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
     public function __construct(
-        private CheckoutService $checkoutService,
         private CartService $cartService,
+        private AddressService $addressService,
     ) {}
 
     public function index()
@@ -26,7 +24,7 @@ class CheckoutController extends Controller
         }
 
         $summary = $this->cartService->getSummary($cart);
-        $addresses = $customer->addresses;
+        $addresses = $this->addressService->getAddresses($customer);
 
         return view('pages.customer.checkout.checkout', compact('cart', 'summary', 'addresses'));
     }
@@ -55,43 +53,11 @@ class CheckoutController extends Controller
             return redirect()->route('cart')->with('error', 'Your cart is empty.');
         }
 
-        $shippingAddress = $validated['street'] . ', ' . $validated['barangay'] . ', ' . $validated['city'] . ', ' . $validated['province'] . ' ' . $validated['postal_code'] . ', ' . $validated['country'];
+        $this->addressService->saveFromOrder($customer, $validated);
 
-        $dto = new CheckoutDataDTO(
-            shippingName: $validated['first_name'] . ' ' . $validated['last_name'],
-            shippingEmail: $validated['shipping_email'],
-            shippingPhone: $validated['shipping_phone'] ?? '',
-            shippingAddress: $shippingAddress,
-            notes: $validated['notes'] ?? '',
-        );
+        session()->put('checkout_data', $validated);
 
-        $order = $this->checkoutService->createOrder($cart, $dto);
-
-        $existing = $customer->addresses()->where('street', $validated['street'])
-            ->where('barangay', $validated['barangay'])
-            ->where('city', $validated['city'])
-            ->where('province', $validated['province'])
-            ->where('postal_code', $validated['postal_code'])
-            ->where('country', $validated['country'])
-            ->first();
-
-        if (!$existing) {
-            $hasExisting = $customer->addresses()->count() > 0;
-
-            CustomerAddress::create([
-                'customer_id' => $customer->customer_id,
-                'address_type' => $validated['address_type'] ?? 'Home',
-                'street' => $validated['street'],
-                'barangay' => $validated['barangay'],
-                'city' => $validated['city'],
-                'province' => $validated['province'],
-                'postal_code' => $validated['postal_code'],
-                'country' => $validated['country'],
-                'is_default' => !$hasExisting,
-            ]);
-        }
-
-        return redirect()->route('payment')->with('order_id', $order->order_id);
+        return redirect()->route('payment');
     }
 
     public function saveAddress(Request $request)
@@ -108,53 +74,8 @@ class CheckoutController extends Controller
         ]);
 
         $customer = Auth::user();
+        $address = $this->addressService->saveOrUpdate($customer, $validated);
 
-        if ($validated['address_id']) {
-            $address = CustomerAddress::where('customer_id', $customer->customer_id)
-                ->findOrFail($validated['address_id']);
-            $address->update([
-                'address_type' => $validated['address_type'],
-                'street' => $validated['street'],
-                'barangay' => $validated['barangay'],
-                'city' => $validated['city'],
-                'province' => $validated['province'],
-                'postal_code' => $validated['postal_code'],
-                'country' => $validated['country'],
-            ]);
-            return response()->json(['address' => $address->fresh()->toArray()]);
-        }
-
-        $existing = $customer->addresses()
-            ->where('street', $validated['street'])
-            ->where('barangay', $validated['barangay'])
-            ->where('city', $validated['city'])
-            ->where('province', $validated['province'])
-            ->where('postal_code', $validated['postal_code'])
-            ->where('country', $validated['country'])
-            ->first();
-
-        if ($existing) {
-            return response()->json([
-                'address' => $existing->toArray(),
-            ]);
-        }
-
-        $hasExisting = $customer->addresses()->count() > 0;
-
-        $address = CustomerAddress::create([
-            'customer_id' => $customer->customer_id,
-            'address_type' => $validated['address_type'],
-            'street' => $validated['street'],
-            'barangay' => $validated['barangay'],
-            'city' => $validated['city'],
-            'province' => $validated['province'],
-            'postal_code' => $validated['postal_code'],
-            'country' => $validated['country'],
-            'is_default' => !$hasExisting,
-        ]);
-
-        return response()->json([
-            'address' => $address->toArray(),
-        ]);
+        return response()->json(['address' => $address->toArray()]);
     }
 }

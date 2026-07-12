@@ -1,21 +1,8 @@
 {{--
-    ==================================================================
     ERP MODULE: Checkout — Payment (Payment Page)
-
     COMPONENT: Order Summary
-
-    DESCRIPTION:
-    Sidebar card showing items count, subtotal, shipping, tax,
-    and grand total for the payment confirmation page.
-
-    ==================================================================
-
-    TODO (Backend Integration):
-    - Replace static values with $cart->subtotal / $cart->tax / $cart->shipping / $cart->grandTotal
-    - Dynamically calculate tax rate from config
-    - Show shipping cost instead of FREE when applicable
-
-    ==================================================================
+    DESCRIPTION: Sidebar card showing items count, subtotal, shipping, tax, and grand total for the payment confirmation page.
+    DATA SOURCE: $cart, $summary from PaymentController@index
 --}}
 
 <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
@@ -23,8 +10,8 @@
 
     <div class="space-y-2.5 text-sm">
         <div class="flex items-center justify-between">
-            <span class="text-gray-500">Items (3)</span>
-            <span class="font-medium text-gray-900">$2,715</span>
+            <span class="text-gray-500">Items ({{ $summary->itemsCount }})</span>
+            <span class="font-medium text-gray-900">${{ number_format($summary->subtotal, 2) }}</span>
         </div>
         <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5 text-gray-500">
@@ -40,7 +27,7 @@
         </div>
         <div class="flex items-center justify-between">
             <span class="text-gray-500">Tax (8%)</span>
-            <span class="font-medium text-gray-900">$202</span>
+            <span class="font-medium text-gray-900">${{ number_format($summary->tax, 2) }}</span>
         </div>
     </div>
 
@@ -48,7 +35,7 @@
 
     <div class="flex items-center justify-between mb-1">
         <span class="text-sm font-semibold text-gray-900">Grand Total</span>
-        <span class="text-lg font-bold text-gray-900">$2,728</span>
+        <span class="text-lg font-bold text-gray-900">${{ number_format($summary->grandTotal, 2) }}</span>
     </div>
 
     <p class="flex items-center gap-1.5 text-xs text-gray-400 mt-3">

@@ -1,85 +1,3 @@
-{{--
-    ==================================================================
-    ERP MODULE: Real-Time Order Synchronization (Tracking Page)
-
-    COMPONENT: Shipment Timeline
-
-    DESCRIPTION:
-    Displays the order lifecycle from placement to delivery.
-    Supports two views:
-      - Collapsed (horizontal): dot + title per step, shown by default
-      - Expanded (vertical):  full details with description, meta, date/time
-
-    The toggle button switches between the two views.
-
-    ==================================================================
-
-    TODO (Backend Integration):
-    - Replace static $timelineSteps with $order->timeline
-      (collection of OrderStatus records ordered by sequence)
-    - Connect to OrderController@trackOrder()
-    - Integrate real-time status updates (Echo / Pusher / Polling)
-    - Dynamically derive state (done / current / pending) from data
-
-    ==================================================================
---}}
-
-@php
-    // TODO: replace this static array with data
-    // returned from OrderController@trackOrder(), typically:
-    // $steps = $order->statusHistory()->orderBy('sequence')->get();
-    $timelineSteps = [
-        [
-            'title' => 'Order Placed',
-            'description' => 'Your order has been received and confirmed.',
-            'meta' => 'Business Name - Online',
-            'date' => 'June 28, 2026',
-            'time' => '10:40 AM',
-            'state' => 'done',
-        ],  
-        [
-            'title' => 'Processing',
-            'description' => 'Our warehouse team is packaging your items.',
-            'meta' => "Business Name's Warehouse - Bulacan, Philippines",
-            'date' => 'June 29, 2026',
-            'time' => '1:00 AM',
-            'state' => 'done',
-        ],
-        [
-            'title' => 'Shipped',
-            'description' => 'Package handed off to J&T Express.',
-            'meta' => 'Business Name - Bulacan, Philippines',
-            'date' => 'June 30, 2026',
-            'time' => '8:45 AM',
-            'state' => 'done',
-        ],
-        [
-            'title' => 'In Transit',
-            'description' => 'Your package is on the way. Passing through Hub.',
-            'meta' => 'J&T Express Hub - Bulacan, Philippines',
-            'date' => 'June 30, 2026',
-            'time' => '10:00 PM',
-            'state' => 'current',
-        ],
-        [
-            'title' => 'Out for Delivery',
-            'description' => 'Package loaded onto delivery vehicle.',
-            'meta' => 'J&T Express Cavite - Cavite, Philippines',
-            'date' => 'July 01, 2026',
-            'time' => 'Est. 7:00 AM',
-            'state' => 'pending',
-        ],
-        [
-            'title' => 'Delivered',
-            'description' => 'Package delivered to your door.',
-            'meta' => '(customer address) - Cavite, Philippines',
-            'date' => 'July 02, 2026',
-            'time' => 'Est. 1:00 PM',
-            'state' => 'pending',
-        ],
-    ];
-@endphp
-
 <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-sm font-semibold text-gray-900">Shipment Timeline</h2>
@@ -91,9 +9,6 @@
         </button>
     </div>
 
-    {{-- ================================================================
-         COLLAPSED / MINIMIZED VIEW (horizontal)
-    ================================================================ --}}
     <div id="timelineCollapsed">
         <div class="flex items-start justify-between">
             @foreach ($timelineSteps as $index => $step)
@@ -133,9 +48,6 @@
         </div>
     </div>
 
-    {{-- ================================================================
-         EXPANDED / MAXIMIZED VIEW (vertical, with full details)
-    ================================================================ --}}
     <div id="timelineExpanded" class="hidden">
         <div class="space-y-0">
             @foreach ($timelineSteps as $step)

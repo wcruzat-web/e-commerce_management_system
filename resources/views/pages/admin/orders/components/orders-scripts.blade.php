@@ -1,58 +1,64 @@
-{{--
-    ERP MODULE: Admin Orders
-    COMPONENT: Orders Scripts
-    DESCRIPTION: Client-side filtering for search, status, and date.
-    TODO (Backend): Remove this — replace with server-side filtering.
---}}
-
 <script>
-    const searchInput = document.querySelector('[data-orders-search]');
-    const statusFilter = document.querySelector('[data-orders-status]');
-    const dateFilter = document.querySelector('[data-orders-date]');
-    const orderRows = document.querySelectorAll('[data-order-row]');
+    var ordersSearchInput = document.getElementById('ordersSearch');
+    var ordersStatusFilter = document.getElementById('ordersStatusFilter');
+    var ordersPaymentFilter = document.getElementById('ordersPaymentFilter');
+    var ordersWrapper = document.getElementById('ordersTableWrapper');
+    var ordersDebounceTimer = null;
 
-    function matchesDateFilter(rowDateStr, filter) {
-        if (!filter) return true;
-        const d = new Date(rowDateStr);
-        if (isNaN(d.getTime())) return false;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    window.reloadOrders = function (url) {
+            var params = new URLSearchParams();
+            if (ordersSearchInput && ordersSearchInput.value) params.set('search', ordersSearchInput.value);
+            if (ordersStatusFilter && ordersStatusFilter.value) params.set('status', ordersStatusFilter.value);
+            if (ordersPaymentFilter && ordersPaymentFilter.value) params.set('payment_status', ordersPaymentFilter.value);
+            params.set('partial', '1');
+            var qs = params.toString();
+            var fetchUrl = '/admin/orders?' + qs;
 
-        if (filter === 'today') {
-            return d.getTime() === today.getTime();
+            if (ordersWrapper) {
+                ordersWrapper.innerHTML = '<div class="text-center py-12 text-gray-400">Loading...</div>';
+            }
+
+            fetch(fetchUrl)
+                .then(function (r) { return r.text(); })
+                .then(function (html) {
+                    if (ordersWrapper) {
+                        ordersWrapper.innerHTML = html;
+                    }
+                    history.replaceState(null, '', '/admin/orders?' + qs.replace('&partial=1', '').replace('partial=1', ''));
+                });
         }
-        if (filter === 'week') {
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-            return d >= startOfWeek && d <= endOfWeek;
+
+        if (ordersSearchInput) {
+            ordersSearchInput.addEventListener('input', function () {
+                clearTimeout(ordersDebounceTimer);
+                ordersDebounceTimer = setTimeout(function () { window.reloadOrders(); }, 300);
+            });
         }
-        if (filter === 'month') {
-            return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth();
+
+        if (ordersStatusFilter) {
+            ordersStatusFilter.addEventListener('change', function () { window.reloadOrders(); });
         }
-        return true;
-    }
 
-    function filterOrders() {
-        const query = (searchInput?.value || '').toLowerCase();
-        const status = statusFilter?.value || '';
-        const dateFilterVal = dateFilter?.value || '';
+        if (ordersPaymentFilter) {
+            ordersPaymentFilter.addEventListener('change', function () { window.reloadOrders(); });
+        }
 
-        orderRows.forEach(row => {
-            const name = (row.dataset.customerName || '').toLowerCase();
-            const rowStatus = row.dataset.orderStatus || '';
-            const rowDate = row.dataset.orderDate || '';
-
-            const matchesSearch = name.includes(query);
-            const matchesStatus = !status || rowStatus === status;
-            const matchesDate = matchesDateFilter(rowDate, dateFilterVal);
-
-            row.style.display = matchesSearch && matchesStatus && matchesDate ? '' : 'none';
-        });
-    }
-
-    searchInput?.addEventListener('input', filterOrders);
-    statusFilter?.addEventListener('change', filterOrders);
-    dateFilter?.addEventListener('change', filterOrders);
+        if (ordersWrapper) {
+            ordersWrapper.addEventListener('click', function (e) {
+                var link = e.target.closest('a[href]:not([href="#"])');
+                if (link && link.href.indexOf('/admin/orders') !== -1) {
+                    e.preventDefault();
+                    var url = new URL(link.href);
+                    url.searchParams.set('partial', '1');
+                    fetch(url.toString())
+                        .then(function (r) { return r.text(); })
+                        .then(function (html) {
+                            if (ordersWrapper) {
+                                ordersWrapper.innerHTML = html;
+                            }
+                            history.replaceState(null, '', link.href);
+                        });
+                }
+            });
+        }
 </script>

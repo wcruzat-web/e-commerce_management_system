@@ -4,6 +4,11 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SuccessController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Models\CustomerAddress;
 use Illuminate\Support\Facades\Route;
 
@@ -19,11 +24,8 @@ Route::redirect('/', '/dummy/shop');
 
 Route::middleware('auth')->group(function () {
 
-    Route::view('/tracking', 'pages.customer.order-tracking.tracking')
-        ->name('tracking');
-
-    Route::view('/track', 'pages.customer.order-tracking.tracking')
-        ->name('orders.track');
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
+    Route::match(['get', 'post'], '/track', [TrackingController::class, 'track'])->name('orders.track');
 
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -34,11 +36,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::post('/checkout/address', [CheckoutController::class, 'saveAddress'])->name('checkout.address.save');
 
-    Route::view('/payment', 'pages.customer.payment.payment')
-        ->name('payment');
+    Route::get('/payment', [PaymentController::class, 'index'])->name('payment');
+    Route::post('/payment', [PaymentController::class, 'process'])->name('payment.process');
 
-    Route::view('/success', 'pages.customer.success.success')
-        ->name('success');
+    Route::get('/success', [SuccessController::class, 'index'])->name('success');
 
 });
 
@@ -94,9 +95,26 @@ Route::get('/dummy/addresses', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('admin')->group(function () {
-    Route::view('/dashboard', 'pages.admin.dashboard.dashboard')->name('admin.dashboard');
-    Route::view('/orders', 'pages.admin.orders.orders')->name('admin.orders');
+Route::prefix('admin')->middleware(['auth', 'role:super_admin,admin'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/dashboard/print', [DashboardController::class, 'print'])->name('admin.dashboard.print');
+    Route::get('/orders', [OrderController::class, 'index'])->name('admin.orders');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+    Route::post('/orders/{order}/payment', [OrderController::class, 'updatePayment'])->name('admin.orders.payment');
+    Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
+    Route::post('/orders/{order}/tracking', [OrderController::class, 'updateTracking'])->name('admin.orders.tracking');
     Route::view('/products', 'pages.admin.products.index')->name('admin.products');
     Route::view('/inventory', 'pages.admin.inventory.index')->name('admin.inventory');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin — User Management (super_admin only)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('admin')->middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users');
+    Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store');
 });

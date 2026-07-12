@@ -20,7 +20,17 @@ class Order extends Model
         'shipping_phone',
         'shipping_address',
         'notes',
+        'payment_status',
+        'payment_method',
+        'paid_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'paid_at' => 'datetime',
+        ];
+    }
 
     public function customer()
     {
@@ -30,5 +40,10 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id', 'order_id');
+    }
+
+    public function tracking()
+    {
+        return $this->hasOne(OrderTracking::class, 'order_id', 'order_id');
     }
 }

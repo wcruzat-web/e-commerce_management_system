@@ -225,3 +225,32 @@ Placeholder pages so navigation works end-to-end:
 - Cleaned original migration (`2026_07_10_134110_create_customer_addresses_table.php`) to match new schema for fresh installs
 - Updated `CustomerAddress` model fillable and seeder accordingly
 - **Note:** `POST /checkout` (store) is still a standard form POST (redirect), not a REST API endpoint. Only `POST /checkout/address` returns JSON (AJAX). REST API for checkout will be done per-page later.
+
+### 5:00 PM — Checkout Components Extracted
+- Extracted checkout into reusable Blade components: `contact-fields`, `address-section`, `order-notes`
+- Created `App\Services\AddressService` + `App\Repositories\CustomerAddressRepository` — OOP separation from CheckoutController
+- `CheckoutController` now injects `AddressService` and `CustomerService` instead of raw repository calls
+- `checkout-details` view reduced; components render via `@include`
+- Updated NOTES.md with OOP architecture docs
+
+### 6:30 PM — Payment Refactored + Success Controller + Order Tracking
+- Extracted `App\Services\PaymentService` — `processPayment()` creates order with `payment_status=pending`, `paid_at=now()`, copies cart items, clears cart, creates order_tracking record
+- Created `App\DTOs\PaymentDataDTO` — typed DTO for validated payment + shipping data
+- `PaymentController` now injects only `PaymentService` + `CartService` (removed `CheckoutService` dependency)
+- `clearCart()` removed from `CheckoutService`, moved to `PaymentService`
+- Created `App\Http\Controllers\SuccessController` — reads `order_id` from session, calls `OrderRepository::findWithItems()`, replaces route closure
+- Created `order_tracking` table migration — `tracking_id` PK, `order_id` FK, `tracking_number` UNIQUE, `order_status`, `courier_name`, `shipped_from`, `estimated_delivery_date`, `last_updated`, `sync_status`
+- Created `App\Models\OrderTracking` — relationships to Order, status constants
+- Created `App\Services\TrackingService` — `findByOrderNumberForCustomer()` (customer-scoped), `buildTimeline()` (from order_tracking or fallback to order.status)
+- Created `App\Http\Controllers\TrackingController` — `index()` pre-loads from session scoped to customer, `track()` POST search with regex `OID-####-####`
+- Auto-generated tracking record at order creation: `TRS-###-###`, ShopEase Express, Bulacan, 5-10 day delivery
+
+### 9:00 PM — Admin Dashboard (Live Data)
+- Created `App\Http\Controllers\Admin\DashboardController` — `index()` + `print()`
+- Created `App\Services\Admin\DashboardService` — `getStats()` (total revenue from paid orders, orders this month, low stock count), `getRecentOrders(limit=2)`, `getRevenueOverview()` (6 months), `getRevenueByCategory()` (sorted highest), `getLowStockProducts()` (stock ≤ 5, sorted ascending)
+- Dashboard components updated to render live DB data instead of static
+- Revenue chart: SVG circles with `data-tooltip` + JS for styled tooltip (dark bg, cyan accent, dynamically positioned)
+- Print report: `print.blade.php` — full printable page with stat cards, SVG chart, category bars, low stocks table, recent orders table. Opens in new tab via "Export Report" button.
+- Timezone changed to `Asia/Kuala_Lumpur` in `config/app.php`
+- Products/categories joined on correct PKs (`categories.id`/`products.id`, not `category_id`)
+- NOTES.md updated with all modules through admin dashboard

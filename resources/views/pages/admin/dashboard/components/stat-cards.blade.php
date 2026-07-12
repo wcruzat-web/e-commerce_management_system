@@ -6,35 +6,35 @@
 --}}
 
 @php
-    $stats = [
+    $statCards = [
         [
             'label' => 'Total Revenue',
-            'value' => '₱247,340',
-            'trend' => '+18.2% vs. last month',
+            'value' => '₱' . number_format($stats['total_revenue'], 2),
+            'trend' => $stats['total_orders'] . ' total orders processed',
             'trend_positive' => true,
             'icon' => 'peso',
             'icon_bg' => 'bg-blue-100 text-blue-900',
         ],
         [
             'label' => 'Orders This Month',
-            'value' => '168',
-            'trend' => '+15.9% vs. last month',
+            'value' => $stats['orders_this_month'],
+            'trend' => 'Orders placed this month',
             'trend_positive' => true,
             'icon' => 'cart',
             'icon_bg' => 'bg-cyan-100 text-cyan-600',
         ],
         [
             'label' => 'Active ERP Syncs',
-            'value' => '3 / 5',
-            'trend' => '1 failed sync streams',
+            'value' => $stats['low_stock_count'] . ' alerts',
+            'trend' => 'Low stock items need attention',
             'trend_positive' => false,
             'icon' => 'sync',
             'icon_bg' => 'bg-amber-100 text-amber-500',
         ],
         [
             'label' => 'Low Stocks Alert',
-            'value' => '3 SKUs',
-            'trend' => '+2 new required stocks',
+            'value' => $stats['low_stock_count'] . ' SKUs',
+            'trend' => 'Items below minimum stock',
             'trend_positive' => false,
             'icon' => 'alert',
             'icon_bg' => 'bg-red-100 text-red-500',
@@ -43,7 +43,7 @@
 @endphp
 
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-    @foreach ($stats as $stat)
+    @foreach ($statCards as $stat)
         <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
             <div class="flex items-start justify-between mb-3">
                 <p class="text-xs text-gray-400">{{ $stat['label'] }}</p>
