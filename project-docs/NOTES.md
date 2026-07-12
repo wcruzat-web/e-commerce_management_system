@@ -658,6 +658,7 @@ Payment flow: Checkout validates → stores data in session → Payment Controll
 | Password reset | Returns "not implemented" |
 | Google OAuth | Placeholder buttons only |
 | REST API for checkout | Only `saveAddress` is JSON; `store` is form POST |
+| `remember_token` missing from customers table | Skipped — remember me disabled in controller for now |
 
 ---
 

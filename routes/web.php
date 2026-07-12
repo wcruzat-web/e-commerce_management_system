@@ -9,6 +9,7 @@ use App\Http\Controllers\SuccessController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\UserController;
 use App\Models\CustomerAddress;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +23,7 @@ Route::redirect('/', '/dummy/shop');
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'customer'])->group(function () {
 
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
     Route::match(['get', 'post'], '/track', [TrackingController::class, 'track'])->name('orders.track');
@@ -76,7 +77,7 @@ Route::get('/dummy/shop/{product:slug}', function (App\Models\Product $product) 
     return view('pages.dummy.shop.show', compact('product'));
 })->name('products.show');
 
-Route::view('/dummy/account', 'pages.dummy.account')->name('account');
+Route::view('/dummy/account', 'pages.dummy.account')->middleware('customer')->name('account');
 
 /*
 |--------------------------------------------------------------------------
@@ -87,7 +88,7 @@ Route::view('/dummy/account', 'pages.dummy.account')->name('account');
 Route::get('/dummy/addresses', function () {
     $addresses = CustomerAddress::where('customer_id', Auth::id())->get();
     return view('pages.dummy.address-preview', compact('addresses'));
-})->middleware('auth')->name('dummy.addresses');
+})->middleware(['auth', 'customer'])->name('dummy.addresses');
 
 /*
 |--------------------------------------------------------------------------
@@ -114,9 +115,9 @@ Route::prefix('admin')->middleware(['auth', 'role:super_admin,admin'])->group(fu
 */
 
 Route::prefix('admin')->middleware(['auth', 'role:super_admin'])->group(function () {
-    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.users');
-    Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create');
-    Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store');
+    Route::get('/users', [UserController::class, 'index'])->name('admin.users');
+    Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('admin.users.store');
 });
 
 Route::get('/shop', function () {

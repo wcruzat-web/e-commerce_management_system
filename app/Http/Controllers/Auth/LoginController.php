@@ -24,7 +24,7 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
-        $customer = $this->customerService->authenticate($validated['email'], $validated['password'], $request->boolean('remember'));
+        $customer = $this->customerService->authenticate($validated['email'], $validated['password'], false);
 
         if (!$customer) {
             return back()->withErrors(['email' => 'The email or password you entered is incorrect.'])
