@@ -36,6 +36,16 @@ class OrderRepository
             ->first();
     }
 
+    public function findByTrackingNumberAndCustomer(string $trackingNumber, int $customerId): ?Order
+    {
+        return Order::with('items', 'tracking')
+            ->whereHas('tracking', function ($q) use ($trackingNumber) {
+                $q->where('tracking_number', $trackingNumber);
+            })
+            ->where('customer_id', $customerId)
+            ->first();
+    }
+
     public function find(int $orderId): ?Order
     {
         return Order::with('items', 'tracking')->find($orderId);

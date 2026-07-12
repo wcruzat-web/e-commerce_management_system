@@ -262,11 +262,6 @@
         const defaultCard = document.querySelector('.address-card input[type=radio]:checked');
         if (defaultCard) {
             defaultCard.closest('.address-card').click();
-        } else {
-            const hasCards = document.querySelectorAll('.address-card').length > 0;
-            if (!hasCards) {
-                openAddressModal(true);
-            }
         }
     });
 

@@ -11,9 +11,12 @@ class TrackingService
         private OrderRepository $orderRepository,
     ) {}
 
-    public function findByOrderNumberForCustomer(string $orderNumber, int $customerId): ?Order
+    public function findByOrderNumberForCustomer(string $number, int $customerId): ?Order
     {
-        return $this->orderRepository->findByOrderNumberAndCustomer($orderNumber, $customerId);
+        if (str_starts_with($number, 'TRS-')) {
+            return $this->orderRepository->findByTrackingNumberAndCustomer($number, $customerId);
+        }
+        return $this->orderRepository->findByOrderNumberAndCustomer($number, $customerId);
     }
 
     public function findById(int $orderId): ?Order
