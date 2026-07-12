@@ -28,11 +28,6 @@ class OrderRepository
         return Order::with('items', 'tracking')->findOrFail($orderId);
     }
 
-    public function findByOrderNumber(string $orderNumber): ?Order
-    {
-        return Order::with('items', 'tracking')->where('order_number', $orderNumber)->first();
-    }
-
     public function findByOrderNumberAndCustomer(string $orderNumber, int $customerId): ?Order
     {
         return Order::with('items', 'tracking')

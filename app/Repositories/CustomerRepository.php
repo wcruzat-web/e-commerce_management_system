@@ -6,16 +6,6 @@ use App\Models\Customer;
 
 class CustomerRepository
 {
-    public function find(int $id): ?Customer
-    {
-        return Customer::find($id);
-    }
-
-    public function findByEmail(string $email): ?Customer
-    {
-        return Customer::where('email', $email)->first();
-    }
-
     public function createRegistered(array $data): Customer
     {
         return Customer::create([

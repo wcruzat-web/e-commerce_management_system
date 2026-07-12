@@ -21,6 +21,9 @@ return new class extends Migration
             $table->string('shipping_phone', 20)->nullable();
             $table->text('shipping_address');
             $table->text('notes')->nullable();
+            $table->string('payment_status')->default('pending');
+            $table->string('payment_method')->nullable();
+            $table->timestamp('paid_at')->nullable();
             $table->timestamps();
 
             $table->foreign('customer_id')

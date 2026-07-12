@@ -11,11 +11,6 @@ class TrackingService
         private OrderRepository $orderRepository,
     ) {}
 
-    public function findByOrderNumber(string $orderNumber): ?Order
-    {
-        return $this->orderRepository->findByOrderNumber($orderNumber);
-    }
-
     public function findByOrderNumberForCustomer(string $orderNumber, int $customerId): ?Order
     {
         return $this->orderRepository->findByOrderNumberAndCustomer($orderNumber, $customerId);

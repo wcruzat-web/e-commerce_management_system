@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Customer;
 use App\Repositories\CustomerRepository;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class CustomerService
 {
