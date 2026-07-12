@@ -118,3 +118,7 @@ Route::prefix('admin')->middleware(['auth', 'role:super_admin'])->group(function
     Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.users.create');
     Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.users.store');
 });
+
+Route::get('/shop', function () {
+    return view('pages.customer.shop.shop');
+});
