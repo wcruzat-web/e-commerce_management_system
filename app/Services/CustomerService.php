@@ -35,7 +35,7 @@ class CustomerService
     public function logout(): void
     {
         Auth::logout();
-        session()->invalidate();
-        session()->regenerateToken();
+        session()->flush();
+        session()->regenerate(true);
     }
 }

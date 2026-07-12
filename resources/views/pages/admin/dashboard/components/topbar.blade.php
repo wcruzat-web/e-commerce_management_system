@@ -73,10 +73,12 @@
 
         {{-- User --}}
         <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-full bg-gray-200"></div>
+            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600 uppercase">
+                {{ substr(Auth::user()->first_name, 0, 1) }}{{ substr(Auth::user()->last_name, 0, 1) }}
+            </div>
             <div class="leading-tight">
-                <p class="text-xs font-semibold text-gray-900">Wency Cruzat</p>
-                <p class="text-[11px] text-gray-400">Super Admin</p>
+                <p class="text-xs font-semibold text-gray-900">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</p>
+                <p class="text-[11px] text-gray-400">{{ str_replace('_', ' ', Auth::user()->role) }}</p>
             </div>
         </div>
     </div>

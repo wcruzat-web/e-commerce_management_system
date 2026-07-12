@@ -50,14 +50,19 @@ Route::middleware(['auth', 'customer'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-Route::view('/forgot-password', 'pages.customer.auth.forgot-password')->name('forgot.password');
-Route::post('/forgot-password', function () {
-    return back()->with('status', 'Password reset is not yet implemented.');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+});
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+
+Route::middleware('guest')->group(function () {
+    Route::view('/forgot-password', 'pages.customer.auth.forgot-password')->name('forgot.password');
+    Route::post('/forgot-password', function () {
+        return back()->with('status', 'Password reset is not yet implemented.');
+    });
 });
 
 /*

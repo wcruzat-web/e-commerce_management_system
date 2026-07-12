@@ -24,11 +24,5 @@
 
     </div>
 </div>
-
 @include('pages.customer.auth.components.auth-scripts')
 @endsection
-
-
-
-
-roles -> customer -> shop -> customer interfaces // admin -> dashboar, product. inventory -> create acc
